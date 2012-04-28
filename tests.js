@@ -1,14 +1,17 @@
-var Game = require('./game')
+var assert = require('assert'),
+	Game = require('./game');
 
-module.exports = {
-    'test Succesfully create a new game instance': function(beforeExit, assert) {
+suite('One new game', function () {
+	var game;
+	setup(function(){
 		game = new Game();
-		assert.isNotNull(game);
-	},
-	'test Add users to the game': function(beforeExit, assert) {
-		game = new Game();
-		assert.eql([], game.get_users())
-		game.add_user({'name': 'daniel'})
-		assert.eql([{'name': 'daniel'}], game.get_users())
-	},
-}
+	});
+    test('Succesfully create a new game instance', function () {
+		assert(game);
+    });
+    test('Add users to the game', function () {
+		assert([], game.get_users());
+		game.add_user({'name': 'daniel'});
+		assert([{'name': 'daniel'}], game.get_users());
+    });
+});
