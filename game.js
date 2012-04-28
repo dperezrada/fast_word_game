@@ -1,0 +1,1 @@
+Game = module.exports  = function(){};
