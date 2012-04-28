@@ -2,4 +2,4 @@
 npm install mocha underscore
 
 #run tests
-mocha tests.js
+./node_modules/mocha/bin/mocha --ui tdd tests.js
