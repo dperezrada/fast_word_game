@@ -18,4 +18,10 @@ suite('One new game', function () {
     test('Add and get game word', function () {
 		assert.equal('supercachilupi', game.get_word());
     });
+    test('Check winner with incorrect word', function () {
+		assert(!game.check_winner('daniel', 'supercachi'));
+    });
+    test('Correct word check', function () {
+		assert(game.check_winner('daniel', 'supercachilupi'));
+    });
 });

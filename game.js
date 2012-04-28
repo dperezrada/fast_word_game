@@ -16,6 +16,9 @@ Game = module.exports  = function(){
 		},
 		get_word: function(){
 			return self.word;
+		},
+		check_winner: function(user_id, word){
+			return word == self.word
 		}
 	};
 };
