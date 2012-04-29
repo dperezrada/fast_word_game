@@ -1,6 +1,16 @@
-var io = require('socket.io').listen(8080),
+var port = process.env.PORT || 3000;
+
+var app = require('express').createServer(),
+	io = require('socket.io').listen(app),
 	Game = require('./game'),
 	words = require('./words');
+
+app.listen(port);
+console.log(port);
+
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '/index.html');
+});
 
 function get_word(){
 	return words[Math.floor(Math.random()*words.length)];
