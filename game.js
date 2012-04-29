@@ -13,6 +13,10 @@ Game = module.exports  = function(){
 			self.users[user_id] = name
 			self.points[user_id] = 0;
 		},
+		remove_user: function(user_id){
+			delete self.users[user_id];
+			delete self.points[user_id];
+		},
 		set_word: function(word){
 			self.word = word;
 		},

@@ -35,4 +35,9 @@ suite('One new game', function () {
 		assert.ok(game.check_winner(1, 'supercachilupi'));
 		assert.deepEqual({'1': 1, '2': 0}, game.get_scores());
     });
+    test('Remove user from game', function () {
+		game.remove_user('1');
+		assert.deepEqual({'2': 'juan'}, game.get_users());
+		assert.deepEqual({'2': 0}, game.get_scores());
+    });
 });
