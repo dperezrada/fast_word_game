@@ -9,9 +9,14 @@ Game = module.exports  = function(){
 		get_users: function(){
 			return self.users;
 		},
-		add_user: function(user_id, name){
-			self.users[user_id] = name
+		add_user: function(user_id, name, screen_name, profile_image_url){
+			self.users[user_id] = {
+				name: name,
+				screen_name: screen_name,
+				profile_image_url: profile_image_url
+			}
 			self.points[user_id] = 0;
+			console.log(self.users);
 		},
 		remove_user: function(user_id){
 			delete self.users[user_id];

@@ -5,15 +5,15 @@ suite('One new game', function () {
 	var game;
 	setup(function(){
 		game = new Game();
-		game.add_user(1,'daniel');
-		game.add_user(2, 'juan');
+		game.add_user(1,'daniel', 'danielguajardok', 'http://imagen.com');
+		game.add_user(2, 'juan', 'juandoc', 'http://imagen.com/2');
 		game.set_word('supercachilupi');
 	});
     test('Succesfully create a new game instance', function () {
 		assert(game);
     });
     test('Add user to the game', function () {	
-		assert.deepEqual({'1': 'daniel', '2': 'juan'}, game.get_users());
+		assert.deepEqual({'1': {'name':'daniel','screen_name':'danielguajardok','profile_image_url':'http://imagen.com'}, '2': {'name':'juan','screen_name':'juandoc','profile_image_url':'http://imagen.com/2'}}, game.get_users());
     });
     test('Add and get game word', function () {
 		assert.equal('supercachilupi', game.get_word());
@@ -37,7 +37,7 @@ suite('One new game', function () {
     });
     test('Remove user from game', function () {
 		game.remove_user('1');
-		assert.deepEqual({'2': 'juan'}, game.get_users());
+		assert.deepEqual({'2': {'name':'juan','screen_name':'juandoc','profile_image_url':'http://imagen.com/2'}}, game.get_users());
 		assert.deepEqual({'2': 0}, game.get_scores());
     });
 });
