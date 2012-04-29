@@ -11,35 +11,56 @@
 <script>
 	$(document).ready(function(){
 		var name = prompt('Name:');
-		var users, word;
+		var users, word, points;
+
+		function new_word(new_word){
+			word = new_word;
+			$('#word').text(word);
+			$('#word_input').val('');
+		}
+		
+		function update_points(points){
+			$('#points').html('');
+			$.each(points, function(key, value) { 
+				$('#points').append('<li>'+users[key]+': '+value+'</li>');
+			});
+		}
+
 		var socket = io.connect('http://localhost:8080');
+		$('#word_input').focus();
 		socket.emit('set_name', { name: name});
 		$('#word_input').keypress(
 			function(e){
 				socket.emit('word_typed', { word: $(this).val()+String.fromCharCode(e.keyCode) });
 			}
 		);
+		socket.on('welcome', function (data) {
+			word = data.word;
+			users = data.users;
+			$('#word').text(data.word);
+			update_points(data.points);
+		});
 		socket.on('new_user', function (data) {
 			users = data.users;
-			word = data.word;
-			$('#word').text(data.word);
+			update_points(data.points);
 		});
 		socket.on('winner', function (data) {
-			var winner_text;
-			if(socket.socket.sessionid == data.user){
-				winner_text = "You win";
-			}else{
-				winner_text = 'User: '+users[data.user]+ ' won';
-			}
-			$('#winner').text(winner_text);
-			word = data.word;
-			$('#word').text(data.word);
-			$('#word_input').val('');
+			$('#winner').text("You win");
+			update_points(data.points);
+			new_word(data.word);
+		});
+		socket.on('user_won', function (data) {
+			$('#winner').text('User '+users[data.user]+ ' won');
+			update_points(data.points);
+			new_word(data.word);
 		});
 	});	
 </script>
 <h1 id="word"></h1>
 <h1 id="winner"></h1>
 <input id="word_input" name="word" value=""/>
+<h2>Scores</h2>
+<ul id="points">
+</ul>
 </body>
 </html>
