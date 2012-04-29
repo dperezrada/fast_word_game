@@ -1,5 +1,12 @@
 #Install dependency
-npm install mocha underscore
+npm install mocha underscore socket.io
 
 #run tests
 ./node_modules/mocha/bin/mocha --ui tdd tests.js
+
+#RUN
+	#You will need to terminals
+	1) node server.js
+	2) python -m SimpleHTTPServer
+	
+	#Go to localhost:8000 and start playing
