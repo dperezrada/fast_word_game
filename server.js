@@ -61,7 +61,7 @@ app.get('/twitter_auth', function(req, res, next){
 		function(error, oauth_access_token, oauth_access_token_secret, results){
 			if (error){
 				console.log(error);
-				res.send("yeah something broke.");
+				res.send("Not authorized");
 			} else {
 				req.session.oauth.access_token = oauth_access_token;
 				req.session.oauth.access_token_secret = oauth_access_token_secret;
@@ -80,7 +80,7 @@ app.get('/twitter_auth', function(req, res, next){
 		}
 		);
 	} else
-		next(new Error("you're not supposed to be here."))
+		next(new Error("Not authorized"))
 });
 
 /*app.get('/setup_user',function(req, res, next){
