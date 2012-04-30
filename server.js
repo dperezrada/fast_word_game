@@ -39,7 +39,7 @@ app.get('/auth/twitter', function(req, res){
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
 		if (error) {
 			console.log(error);
-			res.send("yeah no. didn't work.")
+			res.send("Problem ocurred")
 		}
 		else {
 			req.session.oauth = {};
