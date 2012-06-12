@@ -25,10 +25,9 @@ app.set('view options', {
 app.listen(port);
 console.log(port);
 
-app.get('/', function (req, res) {
+app.get('/game/*', function (req, res) {
 	if (req.session.oauth) {
   		//res.sendfile(__dirname + '/index.html');
-  		console.log(req.session.auth_data);
   		res.render('index',{auth_data: req.session.auth_data});
   	} else {
   		res.redirect('/auth/twitter');
@@ -99,21 +98,39 @@ function get_word(){
 game = new Game();
 game.set_word(get_word());
 
-io.sockets.on('connection', function (socket) {
-	socket.on('set_name', function (data) {
-		game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url);
-		socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores() });
-		socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
-	});
-	socket.on('word_typed', function (data) {
-		if(game.check_winner(socket.id, data.word)){
-			new_word = get_word();
-			game.set_word(new_word);
-			socket.emit('winner', { user: socket.id, points: game.get_scores(), word: new_word});
-			socket.broadcast.emit('user_won', { user: socket.id, points: game.get_scores(), word: new_word});
+games = {};
+
+io.of('').on('connection', function (socket_base) {
+	socket_base.on('join', function(data) {
+		var game = games[data.url];
+
+		console.log("AQUI1");
+		if(!game) {
+			game = new Game();
+			games[data.url] = game;
 		}
+
+		console.log("AQUI2");
+		io.of(data.url)
+		  	.on('connection', function(socket) {
+			  	socket.on('set_name', function (data) {
+					game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url);
+					socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores() });
+					socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+				});
+				socket.on('word_typed', function (data) {
+					if(game.check_winner(socket.id, data.word)){
+						new_word = get_word();
+						game.set_word(new_word);
+						socket.emit('winner', { user: socket.id, points: game.get_scores(), word: new_word});
+						socket.broadcast.emit('user_won', { user: socket.id, points: game.get_scores(), word: new_word});
+					}
+				});
+				socket.on('disconnect', function () {
+					game.remove_user(socket.id);
+				});
+		  });
 	});
-	socket.on('disconnect', function () {
-		game.remove_user(socket.id);
-	});
+	
+
 });

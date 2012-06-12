@@ -30,34 +30,43 @@
 			});
 		}
 
-		var socket = io.connect();
+		var base_socket = io.connect('/');
+		base_socket.emit("join", { url: document.location.pathname}, function(data) {
+			var socket = io.connect(document.location.pathname);
+			console.log('hola1');
+			socket.on('connect',function(){
+				console.log('hola2');
+				socket.emit('set_name', { name: user.name, screen_name: user.screen_name, profile_image_url: user.profile_image_url});
+				$('#word_input').keypress(
+					function(e){
+						socket.emit('word_typed', { word: $(this).val()+String.fromCharCode(e.keyCode) });
+					}
+				);
+				socket.on('welcome', function (data) {
+					word = data.word;
+					users = data.users;
+					$('#word').text(data.word);
+					update_points(data.points);
+				});
+				socket.on('new_user', function (data) {
+					users = data.users;
+					update_points(data.points);
+				});
+				socket.on('winner', function (data) {
+					$('#winner').text("You win");
+					update_points(data.points);
+					new_word(data.word);
+				});
+				socket.on('user_won', function (data) {
+					$('#winner').text('User '+users[data.user]+ ' won');
+					update_points(data.points);
+					new_word(data.word);
+				});
+			});
+		} );
+
 		$('#word_input').focus();
-		socket.emit('set_name', { name: user.name, screen_name: user.screen_name, profile_image_url: user.profile_image_url});
-		$('#word_input').keypress(
-			function(e){
-				socket.emit('word_typed', { word: $(this).val()+String.fromCharCode(e.keyCode) });
-			}
-		);
-		socket.on('welcome', function (data) {
-			word = data.word;
-			users = data.users;
-			$('#word').text(data.word);
-			update_points(data.points);
-		});
-		socket.on('new_user', function (data) {
-			users = data.users;
-			update_points(data.points);
-		});
-		socket.on('winner', function (data) {
-			$('#winner').text("You win");
-			update_points(data.points);
-			new_word(data.word);
-		});
-		socket.on('user_won', function (data) {
-			$('#winner').text('User '+users[data.user]+ ' won');
-			update_points(data.points);
-			new_word(data.word);
-		});
+		
 	});	
 </script>
 <h1 id="word"></h1>
