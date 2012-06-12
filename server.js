@@ -5,6 +5,7 @@ var app = express.createServer(),
 	Game = require('./game'),
 	ejs = require('ejs'),
 	words = require('./words');
+var _ = require('underscore');
 var OAuth= require('oauth').OAuth;
 var oa = new OAuth(
 	"https://api.twitter.com/oauth/request_token",
@@ -100,20 +101,49 @@ game = new Game();
 game.set_word(get_word());
 
 io.sockets.on('connection', function (socket) {
+	socket.on('start_game', function(time){
+		if(game.get_users()[socket.id].admin){
+			game.set_time_limit(time);
+			game.started_time = new Date().getTime();
+			game.set_status('started');
+			socket.broadcast.emit('start_game', { });
+			socket.emit('start_game', { });
+		}
+		while(game.get_time_left() > 0){
+			socket.broadcast.emit('update_time', {  time: game.get_time_left() });
+			socket.emit('update_time', {  time: game.get_time_left() });
+		}
+		// setear tiempo
+		// iniciar juego
+	})
 	socket.on('set_name', function (data) {
-		game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url);
-		socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores() });
-		socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+		if(game.get_status() == 'new'){
+			var admin = (_.size(game.get_users()) === 0);
+			game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url, admin);
+			socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores(), admin: admin });
+			socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+		}else{
+			socket.emit('game_started', { game_started: 'already started' });
+		}
 	});
 	socket.on('word_typed', function (data) {
-		if(game.check_winner(socket.id, data.word)){
-			new_word = get_word();
-			game.set_word(new_word);
-			socket.emit('winner', { user: socket.id, points: game.get_scores(), word: new_word});
-			socket.broadcast.emit('user_won', { user: socket.id, points: game.get_scores(), word: new_word});
+		if(game.get_status() == 'started'){
+			if(game.check_winner(socket.id, data.word)){
+				new_word = get_word();
+				game.set_word(new_word);
+				socket.emit('winner', { user: socket.id, points: game.get_scores(), word: new_word});
+				socket.broadcast.emit('user_won', { user: socket.id, points: game.get_scores(), word: new_word});
+			}
 		}
 	});
 	socket.on('disconnect', function () {
-		game.remove_user(socket.id);
+		// if(_.size(game.get_users()) && game.get_users()[socket.id].admin){
+		 	game.remove_user(socket.id);
+		// 	game.reset_admin();
+		// 	socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+		// }else{
+		// 	game.remove_user(socket.id);
+		// 	socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+		// }
 	});
 });
