@@ -3,122 +3,42 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 
 	<title>Index</title>
-	
+	<script type="text/javascript" src='http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js'></script>
+	<script type="text/javascript" src='/js/bootstrap.js'></script>
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 <body>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script>
 	$(document).ready(function(){
-		var user = {
-			name: '<%= auth_data['name'] %>',
-			screen_name: '<%= auth_data['screen_name'] %>',
-			profile_image_url: '<%= auth_data['profile_image_url'] %>'
-		}
-		var users, word, points;
-
-		function new_word(new_word){
-			console.log(new_word);
-			word = new_word;
-			$('#word').text(word);
-			$('#word_input').val('');
-		}
-		
-		function update_points(points){
-			$('#points').html('');
-			$.each(points, function(key, value) { 
-				$('#points').append('<li><img src="'+users[key].profile_image_url+'">'+users[key].name+': '+value+'</li>');
-			});
-		}
-
-		var socket = io.connect();
-
-		socket.emit("join_game", document.location.pathname);
-		socket.on('game_connected', function(data){
-
-			socket.emit('set_name', { name: user.name, screen_name: user.screen_name, profile_image_url: user.profile_image_url});
-
-			$('#start_game').click(
-				function(e){
-					socket.emit('start_game', { time: $("#time_limit").val()});
-				}
-			);
-
-			$('#word_input').keypress(
-				function(e){
-					socket.emit('word_typed', { word: $(this).val()+String.fromCharCode(e.keyCode) });
-				}
-			);
-			socket.on('welcome', function (data) {
-				word = data.word;
-				users = data.users;
-				$('#word').text(data.word);
-				update_points(data.points);
-
-				if(data.admin)
-					$('#admin').show();
-			});
-			socket.on('start_game', function (){
-				$("#countdown").show();
+		$('.create').bind('click', function(){
+			$('#status').html("Creating connection...");	
+			setTimeout(function(){
+				$('#status').html("Starting game...");	
 				setTimeout(function(){
-					$("#countdown").html("2");
+					$('#status').html("Launching...");	
 					setTimeout(function(){
-						$("#countdown").html("1");
-						setTimeout(function(){
-							$('#game').show();
-							$('#admin').hide();
-						},1000);
-					},1000);
-				},1000);
-			});
-			socket.on('game_started', function (){
-				alert("carajo llegaste tarde");
-			});
-			socket.on('update_time', function (data) {
-				$("#countdown").html(data.time);
-			});
-			socket.on('new_user', function (data) {
-				users = data.users;
-				update_points(data.points);
-			});
-			socket.on('winner', function (data) {
-				$('#winner').text("You win");
-				update_points(data.points);
-				new_word(data.word);
-			});
-			socket.on('user_won', function (data) {
-				$('#winner').text('User '+users[data.user]+ ' won');
-				update_points(data.points);
-				new_word(data.word);
-			});
-		});
-
-		$('#word_input').focus();
-		
+						window.location = "/game/"+Math.floor(Math.random()*1000000000000);
+					}, 1000);					
+				}, 1000);
+			}, 1000);
+		})
 	});	
 </script>
-<div id="admin" style="display:none">
-	<h1>Time Limit</h1>
-	<select id="time_limit">
-		<option selected="selected" value="60">1 minuto</option>
-		<option value="120">2 minutos</option>
-		<option value="180">3 minutos</option>
-		<option value="240">4 minutos</option>
-		<option value="300">5 minutos</option>
-		<option value="360">6 minutos</option>
-	</select>
-	<input type="button" id="start_game" value="Iniciar" />
+
+<div class="container init" id='game'>
+	<div id='' class="hero-unit">
+		<h1 id="">Speed Typing</h1>
+		<br>
+		<p>A real time typing challenge where you compete against your twitter friends</p>
+		<button class="create btn btn-success btn-large main-button">Create game</button>
+		<div id='status'></div>
+	</div>
 </div>
-<div id="countdown" style="display:none">
-	<h1>3</h1>
-</div>
-<div id="game" style="display:none">
-	<h1 id="word"></h1>
-	<h1 id="winner"></h1>
-	<input id="word_input" name="word" value=""/>
-</div>
-<h2>Scores</h2>
-<ul id="points">
-</ul>
+
+	
+
 </body>
 </html>

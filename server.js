@@ -27,22 +27,31 @@ process.on('uncaughtException', function (err) {
 	console.log(err);
 });
 
-app.use(express.cookieParser());
-app.use(express.session({secret: 'codingdojo'}));
-app.set('view engine', 'ejs');
-app.set('view options', {
-    layout: false
-});
+app.configure(function(){
+	app.use(express.static(__dirname + '/public'));
+	app.use(express.cookieParser());
+	app.use(express.session({secret: 'codingdojo'}));
+	app.set('view engine', 'ejs');
+	app.set('view options', {
+	    layout: false
+	});	
+})
 app.listen(port);
 console.log(port);
 
-app.get('/game/*', function (req, res) {
-	// TODO: FIX this, if it's not validated it work
+app.get('/', function (req, res) {
 	if (req.session.oauth) {
-  		//res.sendfile(__dirname + '/index.html');
   		res.render('index',{auth_data: req.session.auth_data});
   	} else {
-  		res.redirect('/auth/twitter?redirect='+req.url);
+  		res.redirect('/auth/twitter');
+  	}
+});
+
+app.get('/game/:game_id', function (req, res) {
+	if (req.session.oauth) {
+  		res.render('game',{auth_data: req.session.auth_data});
+  	} else {
+  		res.redirect('/auth/twitter');
   	}
 });
 
