@@ -16,5 +16,6 @@
 #game .puntuacion {text-align:center;margin-top:20px;}
 #game .main-button {padding:30px 60px;font-size:30px;margin-top:30px;}
 #game #status {margin-top:20px;}
-#game #timer {background-color: transparent; -webkit-box-shadow:0px; }
-#game #timer .modal-bdy {font-size:200px; color: #FFF; padding: 80px; text-align:center;}
+#game #starting-countdown {background-color: transparent; -webkit-box-shadow:0px; border:0px;overflow: hidden; -webkit-box-shadow:none;}
+#game #starting-countdown .modal-bdy {font-size:200px; color: #FFF; padding: 80px; text-align:center;}
+#game .user_column.admin{background-color: #F0B45A;}

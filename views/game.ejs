@@ -32,6 +32,7 @@ $(document).ready(function(){
 		$.each(points, function(key, value) { 
 			$('#points .user_column:eq('+i+') > div').html("");
 			$('#points .user_column:eq('+i+') > div').append('<div style="background:url(https://api.twitter.com/1/users/profile_image?screen_name='+users[key].screen_name+'&size=original) no-repeat" class="user_avatar"></div><div class="user_screen_name">'+users[key].name+'</div> <div class="puntuacion"><h3>Score</h3><h1 class="score">'+value+'</h1><h4>Points</h4></div>');
+			$('#points .user_column:eq('+i+')').toggleClass('admin',users[key].admin);
 			i++;
 		});
 		for (i;i<6;i++)
@@ -69,14 +70,16 @@ $(document).ready(function(){
 				$('#admin').show();
 		});
 		socket.on('start_game', function (){
-			$("#countdown").show();
+			$("#starting-countdown").modal('show');
 			setTimeout(function(){
-				$("#countdown").html("2");
+				$("#starting-countdown .modal-bdy").html("2");
 				setTimeout(function(){
-					$("#countdown").html("1");
+					$("#starting-countdown .modal-bdy").html("1");
 					setTimeout(function(){
 						$('#game').show();
 						$('#admin').hide();
+						$("#starting-countdown").modal('hide');
+						$("#word_input").focus();
 					},1000);
 				},1000);
 			},1000);
@@ -159,8 +162,8 @@ $(document).ready(function(){
 				<div></div>
 			</div>
 		</div>	
-		<div class="modal hide" id="timer">
-			<div class="modal-bdy">2</div>
+		<div class="modal hide" id="starting-countdown">
+			<div class="modal-bdy">3</div>
 		</div>
 </div>
 
