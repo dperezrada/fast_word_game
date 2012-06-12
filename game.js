@@ -59,9 +59,12 @@ Game = module.exports  = function(){
 		set_time_limit: function(time){
 			self.time_limit = time;
 		},
+		set_started_time: function(){
+			self.started_time = new Date().getTime();
+		},
 		get_time_left: function(){
 			var currentTime = new Date().getTime();
-			return self.time_limit - (currentTime - self.started_time);
+			return self.time_limit*1000 - (currentTime - self.started_time);
 
 		}
 	};

@@ -70,8 +70,8 @@
 		socket.on('game_started', function (){
 			alert("carajo llegaste tarde");
 		});
-		socket.on('update_time', function (time) {
-			$("#countdown").html(time);
+		socket.on('update_time', function (data) {
+			$("#countdown").html(data.time);
 		});
 		socket.on('new_user', function (data) {
 			users = data.users;

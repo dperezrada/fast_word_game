@@ -101,10 +101,10 @@ game = new Game();
 game.set_word(get_word());
 
 io.sockets.on('connection', function (socket) {
-	socket.on('start_game', function(time){
+	socket.on('start_game', function (data){
 		if(game.get_users()[socket.id].admin){
-			game.set_time_limit(time);
-			game.started_time = new Date().getTime();
+			game.set_time_limit(data.time);
+			game.set_started_time();
 			game.set_status('started');
 			socket.broadcast.emit('start_game', { });
 			socket.emit('start_game', { });
