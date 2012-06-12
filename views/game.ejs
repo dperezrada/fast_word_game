@@ -4,6 +4,7 @@
 
 	<title>Index</title>
 	<script type="text/javascript" src='http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js'></script>
+	<script type="text/javascript" src='http://underscorejs.org/underscore-min.js'></script>
 	<script type="text/javascript" src='/js/bootstrap.js'></script>
 	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -27,12 +28,19 @@ $(document).ready(function(){
 	}
 	
 	function update_points(points){
+		var k = _.keys(points);
+		var v = _.values(points);
+
+		var sortedPoints = _.sortBy(_.zip(v,k), function(r){
+            return -r[0];
+        });
+
 		//$('#points').html('');
 		var i = 0;
-		$.each(points, function(key, value) { 
+		$.each(sortedPoints, function(key, value) { 
 			$('#points .user_column:eq('+i+') > div').html("");
-			$('#points .user_column:eq('+i+') > div').append('<div style="background:url(https://api.twitter.com/1/users/profile_image?screen_name='+users[key].screen_name+'&size=original) no-repeat" class="user_avatar"></div><div class="user_screen_name">'+users[key].name+'</div> <div class="puntuacion"><h3>Score</h3><h1 class="score">'+value+'</h1><h4>Points</h4></div>');
-			$('#points .user_column:eq('+i+')').toggleClass('admin',users[key].admin);
+			$('#points .user_column:eq('+i+') > div').append('<div style="background:url(https://api.twitter.com/1/users/profile_image?screen_name='+users[value[1]].screen_name+'&size=original) no-repeat" class="user_avatar"></div><div class="user_screen_name">'+users[value[1]].name+'</div> <div class="puntuacion"><h3>Score</h3><h1 class="score">'+value[0]+'</h1><h4>Points</h4></div>');
+			$('#points .user_column:eq('+i+')').toggleClass('admin',users[value[1]].admin);
 			i++;
 		});
 		for (i;i<6;i++)
@@ -143,22 +151,22 @@ $(document).ready(function(){
 			<h2 id="winner"></h2>
 		</div>
 		<div class="row" id="points">
-			<div class="span2 user_column">
+			<div class="span2 user_column place_1">
 				<div></div>
 			</div>
-			<div class="span2 user_column">
+			<div class="span2 user_column place_2">
 				<div></div>
 			</div>
-			<div class="span2 user_column">
+			<div class="span2 user_column place_3">
 				<div></div>
 			</div>
-			<div class="span2 user_column">
+			<div class="span2 user_column place_4">
 				<div></div>
 			</div>
-			<div class="span2 user_column">
+			<div class="span2 user_column place_5">
 				<div></div>
 			</div>
-			<div class="span2 user_column">
+			<div class="span2 user_column place_6">
 				<div></div>
 			</div>
 		</div>	
