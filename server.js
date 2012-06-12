@@ -109,10 +109,10 @@ io.sockets.on('connection', function (socket) {
 			socket.broadcast.emit('start_game', { });
 			socket.emit('start_game', { });
 		}
-		while(game.get_time_left() > 0){
-			socket.broadcast.emit('update_time', {  time: game.get_time_left() });
-			socket.emit('update_time', {  time: game.get_time_left() });
-		}
+		setInterval(function(){
+					socket.broadcast.emit('update_time', {  time: game.get_time_left() });
+					socket.emit('update_time', {  time: game.get_time_left() });
+		}, 1000);
 		// setear tiempo
 		// iniciar juego
 	})

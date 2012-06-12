@@ -64,7 +64,7 @@ Game = module.exports  = function(){
 		},
 		get_time_left: function(){
 			var currentTime = new Date().getTime();
-			return self.time_limit*1000 - (currentTime - self.started_time);
+			return self.time_limit - (currentTime/1000 - self.started_time/1000);
 
 		}
 	};
