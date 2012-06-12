@@ -26,6 +26,7 @@ app.listen(port);
 console.log(port);
 
 app.get('/game/*', function (req, res) {
+	// TODO: FIX this, if it's not validated it work
 	if (req.session.oauth) {
   		//res.sendfile(__dirname + '/index.html');
   		res.render('index',{auth_data: req.session.auth_data});
@@ -43,9 +44,7 @@ app.get('/auth/twitter', function(req, res){
 		else {
 			req.session.oauth = {};
 			req.session.oauth.token = oauth_token;
-			console.log('oauth.token: ' + req.session.oauth.token);
 			req.session.oauth.token_secret = oauth_token_secret;
-			console.log('oauth.token_secret: ' + req.session.oauth.token_secret);
 			res.redirect('https://twitter.com/oauth/authenticate?oauth_token='+oauth_token)
 	}
 	});
@@ -64,7 +63,6 @@ app.get('/twitter_auth', function(req, res, next){
 			} else {
 				req.session.oauth.access_token = oauth_access_token;
 				req.session.oauth.access_token_secret = oauth_access_token_secret;
-				console.log(results);
 				oa.get("https://api.twitter.com/1/account/verify_credentials.json", req.session.oauth.access_token, req.session.oauth.access_token_secret, function(error, data) {
 					data = JSON.parse(data);
 					req.session.auth_data = {
@@ -95,42 +93,38 @@ function get_word(){
 	return words[Math.floor(Math.random()*words.length)];
 }
 
-game = new Game();
-game.set_word(get_word());
-
 games = {};
 
-io.of('').on('connection', function (socket_base) {
-	socket_base.on('join', function(data) {
-		var game = games[data.url];
-
-		console.log("AQUI1");
+io.on('connection', function (socket) {
+	var game;
+	var joined_game = null;
+	socket.on('join_game', function(game_to_join) {
+		joined_game = game_to_join;
+		socket.join(joined_game);
+		game = games[joined_game];
 		if(!game) {
 			game = new Game();
-			games[data.url] = game;
+			game.set_word(get_word());
+			games[joined_game] = game;
 		}
-
-		console.log("AQUI2");
-		io.of(data.url)
-		  	.on('connection', function(socket) {
-			  	socket.on('set_name', function (data) {
-					game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url);
-					socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores() });
-					socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
-				});
-				socket.on('word_typed', function (data) {
-					if(game.check_winner(socket.id, data.word)){
-						new_word = get_word();
-						game.set_word(new_word);
-						socket.emit('winner', { user: socket.id, points: game.get_scores(), word: new_word});
-						socket.broadcast.emit('user_won', { user: socket.id, points: game.get_scores(), word: new_word});
-					}
-				});
-				socket.on('disconnect', function () {
-					game.remove_user(socket.id);
-				});
-		  });
+		socket.emit('game_connected', 'OK');
 	});
-	
-
+	socket.on('set_name', function (data) {
+		game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url);
+		socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores() });
+		socket.broadcast.to(joined_game).emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+	});
+	socket.on('word_typed', function (data) {
+		if(game.check_winner(socket.id, data.word)){
+			new_word = get_word();
+			game.set_word(new_word);
+			socket.emit('winner', { user: socket.id, points: game.get_scores(), word: new_word});
+			socket.broadcast.to(joined_game).emit('user_won', { user: socket.id, points: game.get_scores(), word: new_word});
+		}
+	});
+	socket.on('disconnect', function () {
+		if(game){
+			game.remove_user(socket.id);
+		}
+	});
 });
