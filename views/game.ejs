@@ -1,0 +1,119 @@
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+	<title>Index</title>
+	<script type="text/javascript" src='http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js'></script>
+	<script type="text/javascript" src='/js/bootstrap.js'></script>
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+	<script src="/socket.io/socket.io.js"></script>
+<script>
+	$(document).ready(function(){
+		var user = {
+			name: '<%= auth_data['name'] %>',
+			screen_name: '<%= auth_data['screen_name'] %>',
+			profile_image_url: '<%= auth_data['profile_image_url'] %>'
+		}
+		var users, word, points;
+
+		function new_word(new_word){
+			word = new_word;
+			$('#word').text(word);
+			$('#word_input').val('');
+		}
+		
+		function update_points(points){
+			//$('#points').html('');
+			var i = 0;
+			$.each(points, function(key, value) { 
+				$('#points .user_column:eq('+i+') > div').html("");
+				$('#points .user_column:eq('+i+') > div').append('<div style="background:url(https://api.twitter.com/1/users/profile_image?screen_name='+users[key].screen_name+'&size=original) no-repeat" class="user_avatar"></div><div class="user_screen_name">'+users[key].name+'</div> <div class="puntuacion"><h3>Score</h3><h1 class="score">'+value+'</h1><h4>Points</h4></div>');
+				i++;
+			});
+			for (i;i<6;i++)
+			{
+				$('#points .user_column:eq('+i+') > div').html("");
+				$('#points .user_column:eq('+i+') > div').append('<div style="background:url(/img/incognito.jpg) no-repeat" class="user_avatar"></div><div class="user_screen_name">Waiting for user...</div><div class="puntuacion"><h3>Score</h3> <h1 class="score">?</h1><h4>Points</h4></div>');
+			}
+		}
+
+		var socket = io.connect();
+		$('#word_input').focus();
+		socket.emit('set_name', { name: user.name, screen_name: user.screen_name, profile_image_url: user.profile_image_url});
+		$('#word_input').keypress(
+			function(e){
+				socket.emit('word_typed', { word: $(this).val()+String.fromCharCode(e.keyCode) });
+			}
+		);
+		socket.on('welcome', function (data) {
+			word = data.word;
+			users = data.users;
+			$('#word').text(data.word);
+			update_points(data.points);
+		});
+		socket.on('new_user', function (data) {
+			users = data.users;
+			update_points(data.points);
+		});
+		socket.on('winner', function (data) {
+			$('#winner').text("You win");
+			$('#winner').removeClass('other');
+			$('#winner').addClass('you');
+			update_points(data.points);
+			new_word(data.word);
+		});
+		socket.on('user_won', function (data) {
+			console.log(users[data.user]);
+			$('#winner').text('User @'+users[data.user].screen_name+ ' won');
+			$('#winner').addClass('other');
+			$('#winner').removeClass('you');
+			update_points(data.points);
+			new_word(data.word);
+		});
+	});	
+</script>
+
+<div class="container" id='game'>
+	<div class="alert msg fade in">Give the url to your friends and tell them to join your game! 
+		<button type="button" class="close" data-dismiss="alert">×</button>
+	</div>
+		<div id='' class="hero-unit">
+			<h1 id="word"></h1>
+			<form>
+				<input type=text id="word_input" name="word" value="" class='input-xlarge' />
+			</form>
+			<h2 id="winner"></h2>
+		</div>
+		<div class="row" id="points">
+			<div class="span2 user_column">
+				<div></div>
+			</div>
+			<div class="span2 user_column">
+				<div></div>
+			</div>
+			<div class="span2 user_column">
+				<div></div>
+			</div>
+			<div class="span2 user_column">
+				<div></div>
+			</div>
+			<div class="span2 user_column">
+				<div></div>
+			</div>
+			<div class="span2 user_column">
+				<div></div>
+			</div>
+		</div>	
+		<div class="modal hide" id="timer">
+			<div class="modal-bdy">2</div>
+		</div>
+</div>
+
+
+	
+
+</body>
+</html>

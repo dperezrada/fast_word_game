@@ -1,0 +1,20 @@
+.msg {text-align: center;}
+#game {margin-top:20px; }
+#game .hero-unit {
+	text-align:center;
+}
+#game .hero-unit .init {	min-height:300px;}
+#game input[type=text] {padding:20px;margin-top:20px;}
+#game h2#winner.you {color:green;}
+#game h2#winner.other {color:red;}
+#game .screen_name {background-color:#008ACA;}
+#game .user_column {background-color:#DAF6F8;  min-height:300px}
+#game .user_column > div {padding:10px;;}
+#game .user_avatar {height:120px;background-size:100%;padding:10px;overflow-x:hidden; }
+#game .user_screen_name {background:rgba(0,0,0,0.3);margin-top:-38px;color:#fff;text-align:center;padding:10px 0;}
+#game h1.score {text-align:center;padding:20px;}
+#game .puntuacion {text-align:center;margin-top:20px;}
+#game .main-button {padding:30px 60px;font-size:30px;margin-top:30px;}
+#game #status {margin-top:20px;}
+#game #timer {background-color: transparent; -webkit-box-shadow:0px; }
+#game #timer .modal-bdy {font-size:200px; color: #FFF; padding: 80px; text-align:center;}
