@@ -16,6 +16,10 @@ var oa = new OAuth(
 	"HMAC-SHA1"
 );
 
+process.on('uncaughtException', function (err) {
+	console.log(err);
+});
+
 app.use(express.cookieParser());
 app.use(express.session({secret: 'codingdojo'}));
 app.set('view engine', 'ejs');
