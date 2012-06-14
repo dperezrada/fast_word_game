@@ -5,12 +5,34 @@
 	<title>Index</title>
 	<script type="text/javascript" src='http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js'></script>
 	<script type="text/javascript" src='http://underscorejs.org/underscore-min.js'></script>
+	<script type="text/javascript" src='/js/soundmanager2-nodebug-jsmin.js'></script>
 	<script type="text/javascript" src='/js/bootstrap.js'></script>
 	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 <body>
 	<script src="/socket.io/socket.io.js"></script>
+<script>
+soundManager.url = '/soundManager2.swf';
+soundManager.useFlashBlock = false; // optionally, enable when you're ready to dive in
+/*
+ * read up on HTML5 audio support, if you're feeling adventurous.
+ * iPad/iPhone and devices without flash installed will always attempt to use it.
+*/
+soundManager.onready(function() {
+  // Ready to use; soundManager.createSound() etc. can now be called.
+  soundManager.createSound({
+  id: 'mySound',
+  url: '/audio/CRASH_1.mp3',
+  autoLoad: true,
+  autoPlay: true,
+  onload: function() {
+    //alert('The sound '+this.sID+' loaded!');
+  },
+  volume: 50
+});
+});
+</script>
 <script>
 $(document).ready(function(){
 	
