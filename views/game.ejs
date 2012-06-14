@@ -25,7 +25,7 @@ soundManager.onready(function() {
   id: 'mySound',
   url: '/audio/CRASH_1.mp3',
   autoLoad: true,
-  autoPlay: true,
+  autoPlay: false,
   onload: function() {
     //alert('The sound '+this.sID+' loaded!');
   },
@@ -34,6 +34,36 @@ soundManager.onready(function() {
   soundManager.createSound({
   id: 'type',
   url: '/audio/TYPE.WAV',
+  autoLoad: true,
+  autoPlay: false,
+  onload: function() {
+    //alert('The sound '+this.sID+' loaded!');
+  },
+  volume: 50
+});
+  soundManager.createSound({
+  id: 'step',
+  url: '/audio/beep.mp3',
+  autoLoad: true,
+  autoPlay: false,
+  onload: function() {
+    //alert('The sound '+this.sID+' loaded!');
+  },
+  volume: 50
+});
+soundManager.createSound({
+  id: 'win',
+  url: '/audio/win.wav',
+  autoLoad: true,
+  autoPlay: false,
+  onload: function() {
+    //alert('The sound '+this.sID+' loaded!');
+  },
+  volume: 50
+});
+soundManager.createSound({
+  id: 'winner',
+  url: '/audio/winner.wav',
   autoLoad: true,
   autoPlay: false,
   onload: function() {
@@ -51,7 +81,7 @@ $(document).ready(function(){
 		screen_name: '<%= auth_data['screen_name'] %>',
 		profile_image_url: '<%= auth_data['profile_image_url'] %>'
 	}
-	var users, word, points;
+	var users, word, points, winner;
 
 	function new_word(new_word){
 		word = new_word;
@@ -66,6 +96,9 @@ $(document).ready(function(){
 		var sortedPoints = _.sortBy(_.zip(v,k), function(r){
             return -r[0];
         });
+        if(sortedPoints[0][1]!=winner && sortedPoints[0][1] == socket.socket.sessionid && sortedPoints.length>1 && sortedPoints[0][0]>0)
+        	soundManager.play('winner');
+        winner = sortedPoints[0][1];
 
 		var i = 0;
 		$.each(sortedPoints, function(key, value) { 
@@ -121,9 +154,12 @@ $(document).ready(function(){
 		});
 		socket.on('start_game', function (){
 			$("#starting-countdown").modal('show');
+			soundManager.play('step');
 			setTimeout(function(){
+				soundManager.play('step');
 				$("#starting-countdown .modal-bdy").html("2");
 				setTimeout(function(){
+					soundManager.play('step');
 					$("#starting-countdown .modal-bdy").html("1");
 					setTimeout(function(){
 						$('#game_input').show();
