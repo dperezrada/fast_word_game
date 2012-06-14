@@ -1,5 +1,5 @@
 #Install dependency
-npm install mocha underscore socket.io
+npm install mocha underscore socket.io ejs oauth
 
 #run tests
 ./node_modules/mocha/bin/mocha --ui tdd tests.js
@@ -7,6 +7,6 @@ npm install mocha underscore socket.io
 #RUN
 	#You will need to terminals
 	1) node server.js
-	2) python -m SimpleHTTPServer
+	2) If you got problem with "ejs", go one directory above (cd ..) and run "npm install ejs" there.
 	
 	#Go to localhost:8000 and start playing

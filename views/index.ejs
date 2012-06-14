@@ -1,0 +1,44 @@
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+	<title>Index</title>
+	<script type="text/javascript" src='http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js'></script>
+	<script type="text/javascript" src='/js/bootstrap.js'></script>
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script>
+	$(document).ready(function(){
+		$('.create').bind('click', function(){
+			$('#status').html("Creating connection...");	
+			setTimeout(function(){
+				$('#status').html("Starting game...");	
+				setTimeout(function(){
+					$('#status').html("Launching...");	
+					setTimeout(function(){
+						window.location = "/game/"+Math.floor(Math.random()*1000000000000);
+					}, 1000);					
+				}, 1000);
+			}, 1000);
+		})
+	});	
+</script>
+
+<div class="container init" id='game'>
+	<div id='' class="hero-unit">
+		<h1 id="">Speed Typing</h1>
+		<br>
+		<p>A real time typing challenge where you compete against your twitter friends</p>
+		<button class="create btn btn-success btn-large main-button">Create game</button>
+		<div id='status'></div>
+	</div>
+</div>
+
+	
+
+</body>
+</html>

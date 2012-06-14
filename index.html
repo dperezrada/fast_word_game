@@ -2,11 +2,13 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 
-	<title>Index</title>
-	
+	<title>Pico</title>
+	<script type="text/javascript" src='http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js'></script>
+	<script type="text/javascript" src='/js/bootstrap.js'></script>
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
 </head>
 <body>
-	<script src="/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script>
 	$(document).ready(function(){
@@ -26,7 +28,7 @@
 			});
 		}
 
-		var socket = io.connect('http://localhost:8080');
+		var socket = io.connect();
 		$('#word_input').focus();
 		socket.emit('set_name', { name: name});
 		$('#word_input').keypress(
@@ -58,9 +60,14 @@
 </script>
 <h1 id="word"></h1>
 <h1 id="winner"></h1>
+
+
 <input id="word_input" name="word" value=""/>
 <h2>Scores</h2>
 <ul id="points">
 </ul>
+<div class="hero-unit">
+
+hoal</div>
 </body>
 </html>
