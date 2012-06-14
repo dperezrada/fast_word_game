@@ -1,4 +1,5 @@
 var port = process.env.PORT || 3000;
+var domain = process.env.GAME_DOMAIN || 'localhost:3000';
 var express = require('express');
 var app = express.createServer(),
 	io = require('socket.io').listen(app),
@@ -10,7 +11,7 @@ var OAuth= require('oauth').OAuth;
 
 var get_oauth = function(redirect_url){
 	if(!redirect_url){
-		redirect_url = "http://localhost:3000/twitter_auth";
+		redirect_url = "http://"+domain+"/twitter_auth";
 	}
 	return new OAuth(
 		"https://api.twitter.com/oauth/request_token",
@@ -56,7 +57,7 @@ app.get('/game/:game_id', function (req, res) {
 });
 
 function authorize(req, res){
-	var oa = get_oauth('http://localhost:3000/twitter_auth?redirect='+req.headers.host+req.url);
+	var oa = get_oauth('http://'+domain+'/twitter_auth?redirect='+req.headers.host+req.url);
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
 		if (error) {
 			console.log(error);
@@ -159,14 +160,18 @@ io.on('connection', function (socket) {
 	});
 	socket.on('disconnect', function () {
 		if(game){
-			// if(_.size(game.get_users()) && game.get_users()[socket.id].admin){
+			var adminDisconnected = false;
+
+			// If the disconnected user is the admin, we should pick another admin
+			if(game.get_users()[socket.id].admin){
+				game.reset_admin(socket.id);
+				adminDisconnected = true;
+			}
 			game.remove_user(socket.id);
-			// 	game.reset_admin();
-			// 	socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
-			// }else{
-			// 	game.remove_user(socket.id);
-			// 	socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
-			// }
+			socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+
+			if(adminDisconnected)
+				socket.broadcast.emit('new_admin', {  admin_id: game.get_admin_id(), game_status: game.get_status() });
 		}
 	});
 });

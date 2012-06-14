@@ -67,7 +67,6 @@ $(document).ready(function(){
             return -r[0];
         });
 
-		//$('#points').html('');
 		var i = 0;
 		$.each(sortedPoints, function(key, value) { 
 			$('#points .user_column:eq('+i+') > div').html("");
@@ -79,6 +78,13 @@ $(document).ready(function(){
 		{
 			$('#points .user_column:eq('+i+') > div').html("");
 			$('#points .user_column:eq('+i+') > div').append('<div style="background:url(/img/incognito.jpg) no-repeat" class="user_avatar"></div><div class="user_screen_name">Waiting for user...</div><div class="puntuacion"><h3>Score</h3> <h1 class="score">?</h1><h4>Points</h4></div>');
+		}
+	}
+
+	function update_admin(id, games_status){
+		if(games_status == "new" && socket.socket.sessionid == id){
+			$("#admin").show();
+			$("#game_wait").hide();
 		}
 	}
 
@@ -110,6 +116,8 @@ $(document).ready(function(){
 
 			if(data.admin)
 				$('#admin').show();
+			else
+				$('#game_wait').show();
 		});
 		socket.on('start_game', function (){
 			$("#starting-countdown").modal('show');
@@ -118,8 +126,9 @@ $(document).ready(function(){
 				setTimeout(function(){
 					$("#starting-countdown .modal-bdy").html("1");
 					setTimeout(function(){
-						$('#game').show();
+						$('#game_input').show();
 						$('#admin').hide();
+						$("#game_wait").hide();
 						$("#starting-countdown").modal('hide');
 						$("#word_input").focus();
 					},1000);
@@ -136,6 +145,9 @@ $(document).ready(function(){
 			users = data.users;
 			update_points(data.points);
 		});
+		socket.on('new_admin', function (data) {
+			update_admin(data.admin_id, data.game_status);
+		});
 		socket.on('winner', function (data) {
 			$('#winner').text("You win");
 			$('#winner').removeClass('other');
@@ -144,7 +156,6 @@ $(document).ready(function(){
 			update_points(data.points);
 			new_word(data.word);
 		});
-		
 		socket.on('user_won', function (data) {
 			$('#winner').text('User @'+users[data.user].screen_name+ ' won');
 			$('#winner').addClass('other');
@@ -164,27 +175,30 @@ $(document).ready(function(){
 	<div class="alert msg fade in">Give the url to your friends and tell them to join your game! 
 		<button type="button" class="close" data-dismiss="alert">×</button>
 	</div>
-	<div id="admin" style="display:none">
-		<h1>Time Limit</h1>
-		<select id="time_limit">
-			<option selected="selected" value="60">1 minuto</option>
-			<option value="120">2 minutos</option>
-			<option value="180">3 minutos</option>
-			<option value="240">4 minutos</option>
-			<option value="300">5 minutos</option>
-			<option value="360">6 minutos</option>
-		</select>
-		<input type="button" id="start_game" value="Iniciar" />
-	</div>
 	<div id="countdown" style="display:none">
 		<h1>3</h1>
 	</div>
-		<div id='' class="hero-unit">
+		<div id='game_input' class="hero-unit" style="display:none">
 			<h1 id="word"></h1>
 			<form>
-				<input type=text id="word_input" name="word" value="" class='input-xlarge' />
+				<input type=text id="word_input" name="word" value="" class='input-xlarge' autocomplete="off"/>
 			</form>
 			<h2 id="winner"></h2>
+		</div>
+		<div id="admin" class='hero-unit' style="display:none">
+			<span>Set the game duration</span>
+			<select id="time_limit">
+				<option selected="selected" value="60">1 minute</option>
+				<option value="120">2 minutes</option>
+				<option value="180">3 minutes</option>
+				<option value="240">4 minutes</option>
+				<option value="300">5 minutes</option>
+				<option value="360">6 minutes</option>
+			</select>
+			<input type="button" id="start_game" value="Start" class='create btn btn-success btn-large start-button'/>
+		</div>
+		<div id="game_wait" class='hero-unit' style="display:none">
+			<h1>Waiting the owner to start the game...</h1>
 		</div>
 		<div class="row" id="points">
 			<div class="span2 user_column place_1">
