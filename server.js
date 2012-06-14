@@ -58,7 +58,7 @@ app.get('/game/:game_id', function (req, res) {
 });
 
 app.get('/auth/twitter', function(req, res){
-	var oa = get_oauth('http://'+host+'/twitter_auth?redirect='+req.headers.host+req.query.redirect);
+	var oa = get_oauth('http://'+host+'/twitter_auth?redirect='+req.query.redirect);
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
 		if (error) {
 			console.log(error);
@@ -74,7 +74,7 @@ app.get('/auth/twitter', function(req, res){
 });
 
 app.get('/twitter_auth', function(req, res, next){
-	var oa = get_oauth(req.headers.host+req.query.redirect);
+	var oa = get_oauth(req.query.redirect);
 	if (req.session.oauth) {
 		req.session.oauth.verifier = req.query.oauth_verifier;
 		var oauth = req.session.oauth;
