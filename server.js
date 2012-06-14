@@ -10,17 +10,14 @@ var OAuth= require('oauth').OAuth;
 
 var host = process.env.HOST || 'localhost:3000';
 
-var get_oauth = function(redirect_url){
-	if(!redirect_url){
-		redirect_url = "http://"+host+"/twitter_auth";
-	}
+var get_oauth = function(){
 	return new OAuth(
 		"https://api.twitter.com/oauth/request_token",
 		"https://api.twitter.com/oauth/access_token",
 		"gdnucitVctOr0bQwy8khsQ",
 		"A9QsknaR8OoyN7IACDejRUcmTK6APmPrtbXjaFiCeY",
 		"1.0",
-		redirect_url,
+		"http://fastwords.herokuapp.com/twitter_auth";,
 		"HMAC-SHA1"
 	);
 };
@@ -58,7 +55,7 @@ app.get('/game/:game_id', function (req, res) {
 });
 
 app.get('/auth/twitter', function(req, res){
-	var oa = get_oauth('http://'+host+'/twitter_auth?redirect='+req.query.redirect);
+	var oa = get_oauth();
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
 		if (error) {
 			console.log(error);
@@ -74,7 +71,7 @@ app.get('/auth/twitter', function(req, res){
 });
 
 app.get('/twitter_auth', function(req, res, next){
-	var oa = get_oauth(req.query.redirect);
+	var oa = get_oauth();
 	if (req.session.oauth) {
 		req.session.oauth.verifier = req.query.oauth_verifier;
 		var oauth = req.session.oauth;
@@ -95,7 +92,7 @@ app.get('/twitter_auth', function(req, res, next){
 						name: data['name'],
 						profile_image_url: data['profile_image_url']
 					}
-					res.redirect(req.query.redirect);
+					res.redirect('/');
 				});
 			}
 		}
