@@ -31,6 +31,16 @@ soundManager.onready(function() {
   },
   volume: 50
 });
+  soundManager.createSound({
+  id: 'type',
+  url: '/audio/TYPE.WAV',
+  autoLoad: true,
+  autoPlay: false,
+  onload: function() {
+    //alert('The sound '+this.sID+' loaded!');
+  },
+  volume: 50
+});
 });
 </script>
 <script>
@@ -89,6 +99,7 @@ $(document).ready(function(){
 			function(e){
 				if(e.keyCode==13) return false;
 				socket.emit('word_typed', { word: $(this).val()+String.fromCharCode(e.keyCode) });
+				//soundManager.play('type');
 			}
 		);
 		socket.on('welcome', function (data) {
@@ -129,6 +140,7 @@ $(document).ready(function(){
 			$('#winner').text("You win");
 			$('#winner').removeClass('other');
 			$('#winner').addClass('you');
+			soundManager.play('win');
 			update_points(data.points);
 			new_word(data.word);
 		});
@@ -137,6 +149,7 @@ $(document).ready(function(){
 			$('#winner').text('User @'+users[data.user].screen_name+ ' won');
 			$('#winner').addClass('other');
 			$('#winner').removeClass('you');
+			soundManager.play('loose');
 			update_points(data.points);
 			new_word(data.word);
 		});
