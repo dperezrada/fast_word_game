@@ -8,9 +8,11 @@ var app = express.createServer(),
 var _ = require('underscore');
 var OAuth= require('oauth').OAuth;
 
+var host = process.env.HOST || 'localhost:3000';
+
 var get_oauth = function(redirect_url){
 	if(!redirect_url){
-		redirect_url = "http://localhost:3000/twitter_auth";
+		redirect_url = "http://"+host+"/twitter_auth";
 	}
 	return new OAuth(
 		"https://api.twitter.com/oauth/request_token",
@@ -56,7 +58,7 @@ app.get('/game/:game_id', function (req, res) {
 });
 
 app.get('/auth/twitter', function(req, res){
-	var oa = get_oauth('http://localhost:3000/twitter_auth?redirect='+req.headers.host+req.query.redirect);
+	var oa = get_oauth('http://'+host+'/twitter_auth?redirect='+req.headers.host+req.query.redirect);
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
 		if (error) {
 			console.log(error);
