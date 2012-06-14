@@ -7,6 +7,7 @@ Game = module.exports  = function(){
 	this.time_limit = 60;
 	this.status = 'new';
 	this.started_time;
+	this.admin;
 	var self = this;
 	return {
 		get_users: function(){
@@ -21,14 +22,19 @@ Game = module.exports  = function(){
 			}
 			self.points[user_id] = 0;
 			console.log(self.users);
+			if(admin)
+				self.admin = user_id;
 		},
 		remove_user: function(user_id){
 			delete self.users[user_id];
 			delete self.points[user_id];
 		},
-		reset_admin: function(){
-			if(_.size(self.users)){ 
-				self.users[_.keys(self.users)[0]].admin = true;
+		reset_admin: function(admin_id){
+			var userKeys = _.without(_.keys(self.users), admin_id);
+
+			if(_.size(userKeys)){ 
+				self.users[userKeys[0]].admin = true;
+				self.admin = userKeys[0];
 			}
 		},
 		set_word: function(word){
@@ -66,6 +72,9 @@ Game = module.exports  = function(){
 			var currentTime = new Date().getTime();
 			return self.time_limit - (currentTime/1000 - self.started_time/1000);
 
+		},
+		get_admin_id: function(){
+			return self.admin;
 		}
 	};
 };

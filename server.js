@@ -160,14 +160,18 @@ io.on('connection', function (socket) {
 	});
 	socket.on('disconnect', function () {
 		if(game){
-			// if(_.size(game.get_users()) && game.get_users()[socket.id].admin){
+			var adminDisconnected = false;
+
+			// If the disconnected user is the admin, we should pick another admin
+			if(game.get_users()[socket.id].admin){
+				game.reset_admin(socket.id);
+				adminDisconnected = true;
+			}
 			game.remove_user(socket.id);
-			// 	game.reset_admin();
-			// 	socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
-			// }else{
-			// 	game.remove_user(socket.id);
-			// 	socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
-			// }
+			socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+
+			if(adminDisconnected)
+				socket.broadcast.emit('new_admin', {  admin_id: game.get_admin_id(), game_status: game.get_status() });
 		}
 	});
 });
