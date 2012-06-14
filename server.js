@@ -40,23 +40,23 @@ app.listen(port);
 console.log(port);
 
 app.get('/', function (req, res) {
-	if (req.session.oauth_data) {
+	if (req.session.auth_data) {
   		res.render('index',{auth_data: req.session.auth_data});
   	} else {
-  		res.redirect('/auth/twitter');
+		authorize(req,res);	
   	}
 });
 
 app.get('/game/:game_id', function (req, res) {
-	if (req.session.oauth_data) {
+	if (req.session.auth_data) {
   		res.render('game',{auth_data: req.session.auth_data});
   	} else {
-  		res.redirect('/auth/twitter');
+		authorize(req,res);
   	}
 });
 
-app.get('/auth/twitter', function(req, res){
-	var oa = get_oauth('http://localhost:3000/twitter_auth?redirect='+req.headers.host+req.query.redirect);
+function authorize(req, res){
+	var oa = get_oauth('http://localhost:3000/twitter_auth?redirect='+req.headers.host+req.url);
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
 		if (error) {
 			console.log(error);
@@ -69,10 +69,10 @@ app.get('/auth/twitter', function(req, res){
 			res.redirect('https://twitter.com/oauth/authenticate?oauth_token='+oauth_token)
 	}
 	});
-});
+}
 
 app.get('/twitter_auth', function(req, res, next){
-	var oa = get_oauth(req.headers.host+req.query.redirect);
+	var oa = get_oauth(req.query.redirect);
 	if (req.session.oauth) {
 		req.session.oauth.verifier = req.query.oauth_verifier;
 		var oauth = req.session.oauth;
@@ -93,7 +93,7 @@ app.get('/twitter_auth', function(req, res, next){
 						name: data['name'],
 						profile_image_url: data['profile_image_url']
 					}
-					res.redirect(req.query.redirect);
+					res.redirect('http://'+req.query.redirect);
 				});
 			}
 		}
