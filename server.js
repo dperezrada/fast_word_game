@@ -40,7 +40,7 @@ app.listen(port);
 console.log(port);
 
 app.get('/', function (req, res) {
-	if (req.session.oauth) {
+	if (req.session.oauth_data) {
   		res.render('index',{auth_data: req.session.auth_data});
   	} else {
   		res.redirect('/auth/twitter');
@@ -48,7 +48,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/game/:game_id', function (req, res) {
-	if (req.session.oauth) {
+	if (req.session.oauth_data) {
   		res.render('game',{auth_data: req.session.auth_data});
   	} else {
   		res.redirect('/auth/twitter');
