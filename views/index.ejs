@@ -28,13 +28,10 @@
 			}, 1000);
 		});
 
-		var socket = io.connect();
-
 		var template = Hogan.compile($("#game_summary").html());
 
-		socket.emit("main_page", {});
-		socket.on('games_summary_updated', function(data){
-			var games = _.map(data.summary, function(s){
+		var update_games = function(data){
+			var games = _.map(data, function(s){
 				if(s.status == "new"){
 					s.s_status = "Waiting to start..."
 				}
@@ -49,8 +46,14 @@
 			$("#public-games").empty();
 			_.each(games,function(g){
 				$("#public-games").append(g);
-			})
-		});
+			});
+		}
+
+		setInterval(function(){
+			$.get('api/games', function(data) {
+				update_games(data);
+			});
+		}, 1000);
 
 	});	
 </script>
