@@ -20,3 +20,25 @@
 #game #starting-countdown .modal-bdy {font-size:200px; color: #FFF; padding: 80px; text-align:center;}
 #game .user_column.admin{background-color: #F0B45A;}
 #time_limit{font-size: 19px;height: 36px;margin-top: 9px;}
+
+
+.game_summary .status{
+	text-align: center;
+}
+.game_summary .game_link:hover{
+	text-decoration: none;
+}
+.game_summary .faces{
+	margin:0 -18px;
+}
+.game_summary .face{
+	float:left;
+	list-style: none;
+}
+
+.game_summary .status.top{
+	margin-bottom:4px;
+}
+.game_summary .status.bottom{
+	margin-top:4px;
+}
