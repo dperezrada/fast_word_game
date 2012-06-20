@@ -132,9 +132,14 @@ io.on('connection', function (socket) {
 			socket.emit('start_game', { });
 		}
 		setInterval(function(){
-					socket.broadcast.emit('update_time', {  time: game.get_time_left() });
-					socket.emit('update_time', {  time: game.get_time_left() });
+			socket.broadcast.emit('update_time', {  time: game.get_time_left() });
+			socket.emit('update_time', {  time: game.get_time_left() });
 		}, 1000);
+		setTimeout(function(){
+			game.set_status('ended');			
+			socket.broadcast.to(joined_game).emit('game_ended',{});
+			socket.emit('game_ended',{});
+		}, data.time*1000);
 		// setear tiempo
 		// iniciar juego
 	});

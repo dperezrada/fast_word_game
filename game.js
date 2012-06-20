@@ -21,7 +21,6 @@ Game = module.exports  = function(){
 				admin: admin
 			}
 			self.points[user_id] = 0;
-			console.log(self.users);
 			if(admin)
 				self.admin = user_id;
 		},
