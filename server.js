@@ -25,10 +25,11 @@ var get_oauth = function(redirect_url){
 };
 
 process.on('uncaughtException', function (err) {
-	console.log(err);
+	console.error(err);
 });
 
 app.configure(function(){
+	io.set("log level",2);
 	app.use(express.static(__dirname + '/public'));
 	app.use(express.cookieParser());
 	app.use(express.session({secret: 'codingdojo'}));
@@ -64,7 +65,7 @@ function authorize(req, res){
 	var oa = get_oauth('http://'+domain+'/twitter_auth?redirect='+req.headers.host+req.url);
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
 		if (error) {
-			console.log(error);
+			console.error(error);
 			res.send("Problem ocurred")
 		}
 		else {
@@ -85,7 +86,7 @@ app.get('/twitter_auth', function(req, res, next){
 		oa.getOAuthAccessToken(oauth.token,oauth.token_secret,oauth.verifier, 
 		function(error, oauth_access_token, oauth_access_token_secret, results){
 			if (error){
-				console.log(error);
+				console.error(error);
 				res.send("Not authorized");
 			} else {
 				req.session.oauth.access_token = oauth_access_token;
@@ -127,7 +128,7 @@ io.on('connection', function (socket) {
 			game.set_word(get_word());
 			games[joined_game] = game;
 			games_summary[joined_game] = game.get_summary();
-			socket.broadcast.emit('games_summary_updated', {summary: games_summary});
+			socket.broadcast.to(joined_game).emit('games_summary_updated', {summary: games_summary});
 		}
 		socket.emit('game_connected', 'OK');
 	});
@@ -136,18 +137,25 @@ io.on('connection', function (socket) {
 			game.set_time_limit(data.time);
 			game.set_started_time();
 			game.set_status('started');
-			socket.broadcast.emit('start_game', { });
-			socket.emit('start_game', { });
+			socket.broadcast.to(joined_game).emit('start_game', {points: game.get_scores()});
+			socket.emit('start_game', {points: game.get_scores()});
 			games_summary[game.get_url()] = game.get_summary();
+			setTimeout(function(){
+				game.set_status('ended');
+				game.reset_points();			
+				socket.broadcast.to(joined_game).emit('game_ended',{});
+				socket.emit('game_ended',{});
+			}, data.time*1000);
 		}
-		setInterval(function(){
-					socket.broadcast.emit('update_time', {  time: game.get_time_left() });
-					socket.emit('update_time', {  time: game.get_time_left() });
-		}, 1000);
+		// setInterval(function(){
+		// 	socket.broadcast.to(joined_game).emit('update_time', {  time: game.get_time_left() });
+		// 	socket.emit('update_time', {  time: game.get_time_left() });
+		// }, 1000);
+	
 		// setear tiempo
 		// iniciar juego
 	});
-	socket.on('set_name', function (data) {
+	socket.on('new_user', function (data) {
 		if(game.get_status() == 'new'){
 			var admin = (_.size(game.get_users()) === 0);
 			game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url, admin);
@@ -178,11 +186,11 @@ io.on('connection', function (socket) {
 				adminDisconnected = true;
 			}
 			game.remove_user(socket.id);
-			socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+			socket.broadcast.to(joined_game).emit('new_user', {  users: game.get_users(), points: game.get_scores() });
 			games_summary[game.get_url()] = game.get_summary();
 
 			if(adminDisconnected)
-				socket.broadcast.emit('new_admin', {  admin_id: game.get_admin_id(), game_status: game.get_status() });
+				socket.broadcast.to(joined_game).emit('new_admin', {  admin_id: game.get_admin_id(), game_status: game.get_status() });
 		}
 	});
 });
