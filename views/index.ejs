@@ -4,7 +4,9 @@
 
 	<title>Index</title>
 	<script type="text/javascript" src='http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js'></script>
+	<script type="text/javascript" src='http://underscorejs.org/underscore-min.js'></script>
 	<script type="text/javascript" src='/js/bootstrap.js'></script>
+	<script src="http://twitter.github.com/hogan.js/builds/2.0.0/hogan-2.0.0.js"></script>
 	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
@@ -24,7 +26,35 @@
 					}, 1000);					
 				}, 1000);
 			}, 1000);
-		})
+		});
+
+		var template = Hogan.compile($("#game_summary").html());
+
+		var update_games = function(data){
+			var games = _.map(data, function(s){
+				if(s.status == "new"){
+					s.s_status = "Waiting to start..."
+				}
+				else if(s.status == "started"){
+					s.s_status = "Game already started";
+				}
+
+				s.s_user_count = s.user_count + " player" + ((s.user_count == 1)?"":"s");
+				return template.render(s);;
+			});
+
+			$("#public-games").empty();
+			_.each(games,function(g){
+				$("#public-games").append(g);
+			});
+		}
+
+		setInterval(function(){
+			$.get('api/games', function(data) {
+				update_games(data);
+			});
+		}, 1000);
+
 	});	
 </script>
 
@@ -36,9 +66,27 @@
 		<button class="create btn btn-success btn-large main-button">Create game</button>
 		<div id='status'></div>
 	</div>
+	<h3>Current games:</h3>
+	<ul id="public-games" class="row">
+	</ul>
 </div>
 
-	
+
+<script id="game_summary" type="text/hogan-tmpl">
+	<li class="game_summary span2 well">
+		<a class="game_link" href="{{url}}">
+			<ul class="faces row">
+			{{#users_faces}}
+			  <li class="face"><img src="{{image_url}}" width="35" height="35"/></li>
+			{{/users_faces}}
+			</ul>
+			<div class="status bottom">
+				<h4>{{s_status}}</h4>
+				<h6>{{s_user_count}}</h6>
+			</div>
+		</a>
+	</li>
+</script>
 
 </body>
 </html>

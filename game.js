@@ -8,10 +8,16 @@ Game = module.exports  = function(){
 	this.status = 'new';
 	this.started_time;
 	this.admin;
+	this.url;
 	var self = this;
 	return {
 		get_users: function(){
 			return self.users;
+		},
+		reset_points: function(){
+			_.each(self.points, function(num,key){
+				self.points[key] = 0;
+			})
 		},
 		add_user: function(user_id, name, screen_name, profile_image_url, admin){
 			self.users[user_id] = {
@@ -21,7 +27,6 @@ Game = module.exports  = function(){
 				admin: admin
 			}
 			self.points[user_id] = 0;
-			console.log(self.users);
 			if(admin)
 				self.admin = user_id;
 		},
@@ -75,6 +80,22 @@ Game = module.exports  = function(){
 		},
 		get_admin_id: function(){
 			return self.admin;
+		},
+		get_summary: function(){
+			return {
+				user_count: _.size(self.users),
+				status: self.status,
+				users_faces: _.map(self.users, function(u){
+					return {image_url: u.profile_image_url};
+				}),
+				url: self.url
+			};
+		},
+		set_url: function(url){
+			self.url = url;
+		},
+		get_url: function(){
+			return self.url;
 		}
 	};
 };
