@@ -14,6 +14,11 @@ Game = module.exports  = function(){
 		get_users: function(){
 			return self.users;
 		},
+		reset_points: function(){
+			_.each(self.points, function(num,key){
+				self.points[key] = 0;
+			})
+		},
 		add_user: function(user_id, name, screen_name, profile_image_url, admin){
 			self.users[user_id] = {
 				name: name,

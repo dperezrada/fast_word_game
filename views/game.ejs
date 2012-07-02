@@ -79,7 +79,8 @@ $(document).ready(function(){
 	var user = {
 		name: '<%= auth_data['name'] %>',
 		screen_name: '<%= auth_data['screen_name'] %>',
-		profile_image_url: '<%= auth_data['profile_image_url'] %>'
+		profile_image_url: '<%= auth_data['profile_image_url'] %>',
+		admin: false
 	}
 	var users, word, points, winner;
 
@@ -120,13 +121,21 @@ $(document).ready(function(){
 			$("#game_wait").hide();
 		}
 	}
+	
+	function prepare_new_game(){
+		if(user.admin)
+			$('#admin').show();
+		else
+			$('#game_wait').show();
+		$('#game_input').hide();		
+	}
 
 	var socket = io.connect();
 
 	socket.emit("join_game", document.location.pathname);
 	socket.on('game_connected', function(data){
 
-		socket.emit('set_name', { name: user.name, screen_name: user.screen_name, profile_image_url: user.profile_image_url});
+		socket.emit('new_user', { name: user.name, screen_name: user.screen_name, profile_image_url: user.profile_image_url});
 
 		$('#start_game').click(
 			function(e){
@@ -146,13 +155,11 @@ $(document).ready(function(){
 			users = data.users;
 			$('#word').text(data.word);
 			update_points(data.points);
-
-			if(data.admin)
-				$('#admin').show();
-			else
-				$('#game_wait').show();
+			user['admin'] = data.admin;
+			prepare_new_game();
 		});
-		socket.on('start_game', function (){
+		socket.on('start_game', function (data){
+			update_points(data.points);
 			$("#starting-countdown").modal('show');
 			soundManager.play('step');
 			setTimeout(function(){
@@ -166,6 +173,7 @@ $(document).ready(function(){
 						$('#admin').hide();
 						$("#game_wait").hide();
 						$("#starting-countdown").modal('hide');
+						$("#starting-countdown .modal-bdy").html("3");
 						$("#word_input").focus();
 					},1000);
 				},1000);
@@ -175,6 +183,7 @@ $(document).ready(function(){
 			alert("carajo llegaste tarde");
 		});
 		socket.on('game_ended', function (){
+			prepare_new_game();
 			alert($('#points .user_column:eq(0) div.user_screen_name').text() + " won");
 		});
 		socket.on('update_time', function (data) {
@@ -227,7 +236,8 @@ $(document).ready(function(){
 		<div id="admin" class='hero-unit' style="display:none">
 			<span>Set the game duration</span>
 			<select id="time_limit">
-				<option selected="selected" value="60">1 minute</option>
+				<option selected="selected" value="20">20 secs</option>
+				<option value="60">1 minute</option>
 				<option value="120">2 minutes</option>
 				<option value="180">3 minutes</option>
 				<option value="240">4 minutes</option>
