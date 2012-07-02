@@ -56,6 +56,10 @@ app.get('/game/:game_id', function (req, res) {
   	}
 });
 
+app.get('/api/games', function (req, res) {
+  	res.json(games_summary);
+});
+
 function authorize(req, res){
 	var oa = get_oauth('http://'+domain+'/twitter_auth?redirect='+req.headers.host+req.url);
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
@@ -108,6 +112,7 @@ function get_word(){
 }
 
 games = {};
+games_summary = {};
 
 io.on('connection', function (socket) {
 	var game;
@@ -118,8 +123,11 @@ io.on('connection', function (socket) {
 		game = games[joined_game];
 		if(!game) {
 			game = new Game();
+			game.set_url(joined_game);
 			game.set_word(get_word());
 			games[joined_game] = game;
+			games_summary[joined_game] = game.get_summary();
+			socket.broadcast.emit('games_summary_updated', {summary: games_summary});
 		}
 		socket.emit('game_connected', 'OK');
 	});
@@ -130,6 +138,7 @@ io.on('connection', function (socket) {
 			game.set_status('started');
 			socket.broadcast.emit('start_game', { });
 			socket.emit('start_game', { });
+			games_summary[game.get_url()] = game.get_summary();
 		}
 		setInterval(function(){
 			socket.broadcast.emit('update_time', {  time: game.get_time_left() });
@@ -149,6 +158,7 @@ io.on('connection', function (socket) {
 			game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url, admin);
 			socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores(), admin: admin });
 			socket.broadcast.to(joined_game).emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+			games_summary[game.get_url()] = game.get_summary();
 		}else{
 			socket.emit('game_started', { game_started: 'already started' });
 		}
@@ -174,6 +184,7 @@ io.on('connection', function (socket) {
 			}
 			game.remove_user(socket.id);
 			socket.broadcast.emit('new_user', {  users: game.get_users(), points: game.get_scores() });
+			games_summary[game.get_url()] = game.get_summary();
 
 			if(adminDisconnected)
 				socket.broadcast.emit('new_admin', {  admin_id: game.get_admin_id(), game_status: game.get_status() });
