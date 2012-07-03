@@ -97,9 +97,13 @@ $(document).ready(function(){
 	}
 	var users, word, points, winner;
 
-	function new_word(new_word){
+	function new_word(new_word,question){
 		word = new_word;
-		$('#word').text(word);
+		$('#question').text(question);
+		$('#word').text('');
+		setTimeout(function(){
+			$('#word').text(word);
+		},1500);
 		$('#word_input').val('');
 	}
 	
@@ -167,6 +171,7 @@ $(document).ready(function(){
 			word = data.word;
 			users = data.users;
 			$('#word').text(data.word);
+			$('#question').text(data.question);
 			update_points(data.points);
 			user['admin'] = data.admin;
 			prepare_new_game();
@@ -215,7 +220,7 @@ $(document).ready(function(){
 			$('#winner').addClass('you');
 			soundManager.play('win');
 			update_points(data.points);
-			new_word(data.word);
+			new_word(data.word, data.question);
 		});
 		socket.on('user_won', function (data) {
 			$('#winner').text('User @'+users[data.user].screen_name+ ' won');
@@ -223,7 +228,7 @@ $(document).ready(function(){
 			$('#winner').removeClass('you');
 			soundManager.play('loose');
 			update_points(data.points);
-			new_word(data.word);
+			new_word(data.word, data.question);
 		});
 	});
 
@@ -233,13 +238,14 @@ $(document).ready(function(){
 </script>
 
 <div class="container" id='game'>
-	<div class="alert msg fade in">Give the url to your friends and tell them to join your game! 
+	<<div class="alert msg fade in">Give the url to your friends and tell them to join your game! 
 		<button type="button" class="close" data-dismiss="alert">×</button>
 	</div>
 	<div id="countdown" style="display:none">
 		<h1>3</h1>
 	</div>
 		<div id='game_input' class="hero-unit" style="display:none">
+			<h1 id="question"></h1>
 			<h1 id="word"></h1>
 			<form>
 				<input type=text id="word_input" name="word" value="" class='input-xlarge' autocomplete="off"/>

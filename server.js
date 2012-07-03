@@ -6,6 +6,7 @@ var app = express.createServer(),
 	Game = require('./game'),
 	ejs = require('ejs'),
 	words = require('./words');
+	questions = require('./questions');
 var _ = require('underscore');
 var OAuth= require('oauth').OAuth;
 
@@ -105,11 +106,11 @@ app.get('/twitter_auth', function(req, res, next){
 		}
 		);
 	} else
-		next(new Error("Not authorized"))
+		next(new Error("Not authorized"));
 });
 
-function get_word(){
-	return words[Math.floor(Math.random()*words.length)];
+function get_index(){
+	return Math.floor(Math.random()*words.length);
 }
 
 games = {};
@@ -125,7 +126,7 @@ io.on('connection', function (socket) {
 		if(!game) {
 			game = new Game();
 			game.set_url(joined_game);
-			game.set_word(get_word());
+			game.set_word(words[get_index()]);
 			games[joined_game] = game;
 			games_summary[joined_game] = game.get_summary();
 			socket.broadcast.to(joined_game).emit('games_summary_updated', {summary: games_summary});
@@ -159,7 +160,7 @@ io.on('connection', function (socket) {
 		if(game.get_status() == 'new'){
 			var admin = (_.size(game.get_users()) === 0);
 			game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url, admin);
-			socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores(), admin: admin });
+			socket.emit('welcome', {  question: "Type the word:", word: game.get_word(), users: game.get_users(), points: game.get_scores(), admin: admin });
 			socket.broadcast.to(joined_game).emit('new_user', {  users: game.get_users(), points: game.get_scores() });
 			games_summary[game.get_url()] = game.get_summary();
 		}else{
@@ -169,10 +170,11 @@ io.on('connection', function (socket) {
 	socket.on('word_typed', function (data) {
 		if(game.get_status() == 'started'){
 			if(game.check_winner(socket.id, data.word)){
-				new_word = get_word();
+				var index = get_index();
+				new_word = words[index];
 				game.set_word(new_word);
-				socket.emit('winner', { user: socket.id, points: game.get_scores(), word: new_word});
-				socket.broadcast.to(joined_game).emit('user_won', { user: socket.id, points: game.get_scores(), word: new_word});
+				socket.emit('winner', { user: socket.id, points: game.get_scores(), question: questions[index], word: new_word});
+				socket.broadcast.to(joined_game).emit('user_won', { user: socket.id, points: game.get_scores(), question: questions[index], word: new_word});
 			}
 		}
 	});
