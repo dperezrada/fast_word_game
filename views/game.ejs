@@ -27,10 +27,8 @@
 	<script src="/socket.io/socket.io.js"></script>
 <script>
 soundManager.url = '/soundmanager2.swf';
-soundManager.useFlashBlock = false; // optionally, enable when you're ready to dive in
+soundManager.useFlashBlock = false;
 /*
- * read up on HTML5 audio support, if you're feeling adventurous.
- * iPad/iPhone and devices without flash installed will always attempt to use it.
 */
 soundManager.onready(function() {
   // Ready to use; soundManager.createSound() etc. can now be called.
@@ -88,18 +86,21 @@ soundManager.createSound({
 </script>
 <script>
 $(document).ready(function(){
-	
 	var user = {
 		name: '<%= auth_data['name'] %>',
 		screen_name: '<%= auth_data['screen_name'] %>',
 		profile_image_url: '<%= auth_data['profile_image_url'] %>',
-		admin: false
+		admin: false,
+		handicap: 0
 	}
 	var users, word, points, winner;
 
 	function new_word(new_word){
 		word = new_word;
-		$('#word').text(word);
+		$('#word').text("");
+		setTimeout(function(){
+			$('#word').text(word);
+		}, 10 * user.handicap);
 		$('#word_input').val('');
 	}
 	
@@ -112,6 +113,7 @@ $(document).ready(function(){
         });
         if(sortedPoints[0][1]!=winner && sortedPoints[0][1] == socket.socket.sessionid && sortedPoints.length>1 && sortedPoints[0][0]>0)
         	soundManager.play('winner');
+
         winner = sortedPoints[0][1];
 
 		var i = 0;
@@ -196,7 +198,12 @@ $(document).ready(function(){
 		});
 		socket.on('game_ended', function (){
 			prepare_new_game();
-			alert($('#points .user_column:eq(0) div.user_screen_name').text() + " won");
+			$("#winner-alert .modal-bdy").html("<p>...and the winner is</p>" + $('#points .user_column:eq(0) div.user_screen_name').text());
+			$("#winner-alert").modal('show');
+			setTimeout(function(){
+				$("#winner-alert").modal('hide');
+			},4000);
+			//alert($('#points .user_column:eq(0) div.user_screen_name').text() + " won");
 		});
 		socket.on('update_time', function (data) {
 			$("#countdown").html(data.time);
@@ -213,6 +220,7 @@ $(document).ready(function(){
 			$('#winner').removeClass('other');
 			$('#winner').addClass('you');
 			soundManager.play('win');
+			user.handicap ++;
 			update_points(data.points);
 			new_word(data.word);
 		});
@@ -221,6 +229,7 @@ $(document).ready(function(){
 			$('#winner').addClass('other');
 			$('#winner').removeClass('you');
 			soundManager.play('loose');
+			user.handicap = 0;
 			update_points(data.points);
 			new_word(data.word);
 		});
@@ -289,6 +298,9 @@ $(document).ready(function(){
 		</div>	
 		<div class="modal hide" id="starting-countdown">
 			<div class="modal-bdy">3</div>
+		</div>
+		<div class="modal hide" id="winner-alert">
+			<div class="modal-bdy">The Winner!</div>
 		</div>
 </div>
 
