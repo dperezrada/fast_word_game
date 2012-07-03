@@ -5,6 +5,7 @@ Game = module.exports  = function(){
 	this.word;
 	this.points = {};
 	this.time_limit = 60;
+	this.words_set = 'Countries';
 	this.status = 'new';
 	this.started_time;
 	this.admin;
@@ -50,7 +51,7 @@ Game = module.exports  = function(){
 		},
 		check_winner: function(user_id, word){
 			if(typeof(self.users[user_id]) != "undefined"){
-				if(word && word === self.word){
+				if(word && word.toLowerCase() === self.word.toLowerCase()){
 					self.word = null;
 					self.points[user_id]++;
 					return true
@@ -69,6 +70,12 @@ Game = module.exports  = function(){
 		},
 		set_time_limit: function(time){
 			self.time_limit = time;
+		},
+		set_words_set: function(words_set){
+			self.words_set = words_set;
+		},
+		get_words_set: function(){
+			return self.words_set;
 		},
 		set_started_time: function(){
 			self.started_time = new Date().getTime();
