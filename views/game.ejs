@@ -152,7 +152,7 @@ $(document).ready(function(){
 
 		$('#start_game').click(
 			function(e){
-				socket.emit('start_game', { time: $("#time_limit").val()});
+				socket.emit('start_game', { time: $("#time_limit").val(), words_set: $("#words_set").val()});
 			}
 		);
 
@@ -164,14 +164,13 @@ $(document).ready(function(){
 			}
 		);
 		socket.on('welcome', function (data) {
-			word = data.word;
 			users = data.users;
-			$('#word').text(data.word);
 			update_points(data.points);
 			user['admin'] = data.admin;
 			prepare_new_game();
 		});
 		socket.on('start_game', function (data){
+			new_word(data.word);
 			update_points(data.points);
 			$("#starting-countdown").modal('show');
 			soundManager.play('step');
@@ -249,13 +248,19 @@ $(document).ready(function(){
 		<div id="admin" class='hero-unit' style="display:none">
 			<span>Set the game duration</span>
 			<select id="time_limit">
-				<option selected="selected" value="20">20 secs</option>
-				<option value="60">1 minute</option>
+				<option selected="selected" value="60">1 minute</option>
 				<option value="120">2 minutes</option>
 				<option value="180">3 minutes</option>
 				<option value="240">4 minutes</option>
 				<option value="300">5 minutes</option>
 				<option value="360">6 minutes</option>
+			</select>
+			<br>
+			<span>Words set</span>
+			<select id="words_set">
+				<option selected="selected" value="Countries">Countries</option>
+				<option value="Basketball players">Basketball players</option>
+				<option value="Tennis players">Tennis players</option>
 			</select>
 			<input type="button" id="start_game" value="Start" class='create btn btn-success btn-large start-button'/>
 		</div>

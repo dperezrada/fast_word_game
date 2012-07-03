@@ -5,7 +5,7 @@ var app = express.createServer(),
 	io = require('socket.io').listen(app),
 	Game = require('./game'),
 	ejs = require('ejs'),
-	words = require('./words');
+	words = require('./words/all');
 var _ = require('underscore');
 var OAuth= require('oauth').OAuth;
 
@@ -108,8 +108,8 @@ app.get('/twitter_auth', function(req, res, next){
 		next(new Error("Not authorized"))
 });
 
-function get_word(){
-	return words[Math.floor(Math.random()*words.length)];
+function get_word(words_set){
+	return words[words_set].words[Math.floor(Math.random()*words[words_set].total)];
 }
 
 games = {};
@@ -125,7 +125,6 @@ io.on('connection', function (socket) {
 		if(!game) {
 			game = new Game();
 			game.set_url(joined_game);
-			game.set_word(get_word());
 			games[joined_game] = game;
 			games_summary[joined_game] = game.get_summary();
 			socket.broadcast.to(joined_game).emit('games_summary_updated', {summary: games_summary});
@@ -135,10 +134,12 @@ io.on('connection', function (socket) {
 	socket.on('start_game', function (data){
 		if(game.get_users()[socket.id].admin){
 			game.set_time_limit(data.time);
+			game.set_words_set(data.words_set);
+			game.set_word(get_word(game.get_words_set()));
 			game.set_started_time();
 			game.set_status('started');
-			socket.broadcast.to(joined_game).emit('start_game', {points: game.get_scores()});
-			socket.emit('start_game', {points: game.get_scores()});
+			socket.broadcast.to(joined_game).emit('start_game', {points: game.get_scores(), word: game.get_word()});
+			socket.emit('start_game', {points: game.get_scores(), word: game.get_word()});
 			games_summary[game.get_url()] = game.get_summary();
 			setTimeout(function(){
 				game.set_status('ended');
@@ -159,7 +160,7 @@ io.on('connection', function (socket) {
 		if(game.get_status() == 'new'){
 			var admin = (_.size(game.get_users()) === 0);
 			game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url, admin);
-			socket.emit('welcome', {  word: game.get_word(), users: game.get_users(), points: game.get_scores(), admin: admin });
+			socket.emit('welcome', { users: game.get_users(), points: game.get_scores(), admin: admin });
 			socket.broadcast.to(joined_game).emit('new_user', {  users: game.get_users(), points: game.get_scores() });
 			games_summary[game.get_url()] = game.get_summary();
 		}else{
@@ -169,7 +170,7 @@ io.on('connection', function (socket) {
 	socket.on('word_typed', function (data) {
 		if(game.get_status() == 'started'){
 			if(game.check_winner(socket.id, data.word)){
-				new_word = get_word();
+				new_word = get_word(game.get_words_set());
 				game.set_word(new_word);
 				socket.emit('winner', { user: socket.id, points: game.get_scores(), word: new_word});
 				socket.broadcast.to(joined_game).emit('user_won', { user: socket.id, points: game.get_scores(), word: new_word});
