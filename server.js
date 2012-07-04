@@ -191,7 +191,13 @@ io.on('connection', function (socket) {
 			games_summary[game.get_url()] = game.get_summary();
 
 			if(adminDisconnected)
-				socket.broadcast.to(joined_game).emit('new_admin', {  admin_id: game.get_admin_id(), game_status: game.get_status() });
+			{
+				if(game.get_admin_id())
+					socket.broadcast.to(joined_game).emit('new_admin', {  admin_id: game.get_admin_id(), game_status: game.get_status() });
+				else
+					delete games_summary[game.get_url()];
+			}
+				
 		}
 	});
 });
