@@ -1,6 +1,8 @@
 var countries = require('./countries'),
 	basketball = require('./basketball_players'),
-	tennis = require('./tennis_players');
+	tennis = require('./tennis_players'),
+	rockers = require('./rockers'),
+	animals = require('./animals');
 
 module.exports = {
 	'Countries': {
@@ -14,5 +16,13 @@ module.exports = {
 	'Tennis players': {
 		'total': tennis.length,
 		'words': tennis
+	},
+	'Rock bands': {
+		'total': rockers.length,
+		'words': rockers
+	},
+	'Animals': {
+		'total': animals.length,
+		'words': animals
 	}
 }
