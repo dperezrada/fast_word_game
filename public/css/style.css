@@ -43,3 +43,13 @@
 .game_summary .status.bottom{
 	margin-top:4px;
 }
+
+.correct_letters{
+	color:green;
+}
+.error_letters{
+	color:red;
+}
+.left_letters{
+	color:gray;
+}

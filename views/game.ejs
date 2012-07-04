@@ -7,6 +7,7 @@
 	<script type="text/javascript" src='http://underscorejs.org/underscore-min.js'></script>
 	<script type="text/javascript" src='/js/soundmanager2-nodebug-jsmin.js'></script>
 	<script type="text/javascript" src='/js/bootstrap.js'></script>
+	<script type="text/javascript" src='/js/diff_match_patch.js'></script>
 	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="/css/style.css">
 	<script type="text/javascript">
@@ -96,12 +97,13 @@ $(document).ready(function(){
 	var users, word, points, winner;
 
 	function new_word(new_word){
-		word = new_word;
+		word = new_word.toLowerCase();
 		$('#word').text("");
 		setTimeout(function(){
 			$('#word').text(word);
 		}, 10 * user.handicap);
 		$('#word_input').val('');
+		correct_count = 0;
 	}
 	
 	function update_points(points){
@@ -142,10 +144,24 @@ $(document).ready(function(){
 			$('#admin').show();
 		else
 			$('#game_wait').show();
-		$('#game_input').hide();		
+		$('#game_input').hide();
+	}
+
+	function update_word_colors(typed_word){
+		correct_count = 0;
+		for(var i=0; i < typed_word.length; i++){
+			if(typed_word[i] === word[i]) correct_count++;
+			else break;
+		};
+
+		$("#word").empty();
+		//var error = false;
+		$("#word").append($("<span class='correct_letters'>" + word.substring(correct_count, -1) + "</span>"));
+		$("#word").append($("<span>" + word.substring(correct_count) + "</span>").addClass((typed_word.length - correct_count > 0)? "error_letters": "left_letters"));
 	}
 
 	var socket = io.connect();
+	var correct_count;
 
 	socket.emit("join_game", document.location.pathname);
 	socket.on('game_connected', function(data){
@@ -161,7 +177,22 @@ $(document).ready(function(){
 		$('#word_input').keypress(
 			function(e){
 				if(e.keyCode==13) return false;
-				socket.emit('word_typed', { word: $(this).val()+String.fromCharCode(e.keyCode) });
+				var typed_word = $(this).val()+String.fromCharCode(e.keyCode);
+				socket.emit('word_typed', { word: typed_word });
+				update_word_colors(typed_word);
+				//soundManager.play('type');
+			}
+		);
+		$('#word_input').keyup(
+			function(e){
+				e.preventDefault();
+				if(e.keyCode==8){
+					var typed_word = $(this).val()+String.fromCharCode(e.keyCode);
+					var cleaned_word = word.substring(correct_count, -1);
+					$(this).val(cleaned_word);
+					update_word_colors(cleaned_word);
+				}
+				return false;
 				//soundManager.play('type');
 			}
 		);
@@ -248,7 +279,11 @@ $(document).ready(function(){
 		<h1>3</h1>
 	</div>
 		<div id='game_input' class="hero-unit" style="display:none">
-			<h1 id="word"></h1>
+			<h1 id="word">
+				<span class="correct_letters"></span>
+				<span class="error_letters"></span>
+				<span class="left_letters"></span>
+			</h1>
 			<form>
 				<input type=text id="word_input" name="word" value="" class='input-xlarge' autocomplete="off"/>
 			</form>
