@@ -211,16 +211,16 @@ $(document).ready(function(){
 			soundManager.play('step');
 			setTimeout(function(){
 				soundManager.play('step');
-				$("#starting-countdown .modal-bdy").html("2");
+				$("#starting-countdown .starting-countdown-numbers").html("2");
 				setTimeout(function(){
 					soundManager.play('step');
-					$("#starting-countdown .modal-bdy").html("1");
+					$("#starting-countdown .starting-countdown-numbers").html("1");
 					setTimeout(function(){
 						$('#game_input').show();
 						$('#admin').hide();
 						$("#game_wait").hide();
 						$("#starting-countdown").modal('hide');
-						$("#starting-countdown .modal-bdy").html("3");
+						$("#starting-countdown .starting-countdown-numbers").html("3");
 					},1000);
 				},1000);
 			},1000);
@@ -331,7 +331,9 @@ $(document).ready(function(){
 			</div>
 		</div>	
 		<div class="modal hide" id="starting-countdown">
-			<div class="modal-bdy">3</div>
+			<div class="modal-bdy">
+				<div>Start typing in...</div>
+				<div class="starting-countdown-numbers">3</div>
 		</div>
 		<div class="modal hide" id="winner-alert">
 			<div class="modal-bdy">The Winner!</div>
