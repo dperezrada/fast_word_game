@@ -157,7 +157,7 @@ io.on('connection', function (socket) {
 		// iniciar juego
 	});
 	socket.on('new_user', function (data) {
-		if(game.get_status() == 'new'){
+		if(game.get_status() == 'new' || game.get_status() == 'ended'){
 			var admin = (_.size(game.get_users()) === 0);
 			game.add_user(socket.id, data.name, data.screen_name, data.profile_image_url, admin);
 			socket.emit('welcome', { users: game.get_users(), points: game.get_scores(), admin: admin });
