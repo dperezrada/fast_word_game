@@ -132,7 +132,8 @@ $(document).ready(function(){
 	}
 
 	function update_admin(id, games_status){
-		if(games_status == "new" && socket.socket.sessionid == id){
+		if(games_status == "new" && socket.socket.sessionid == id){			
+			user.admin = true;
 			$("#admin").show();
 			$("#game_wait").hide();
 		}
