@@ -7,7 +7,6 @@
 	<script type="text/javascript" src='http://underscorejs.org/underscore-min.js'></script>
 	<script type="text/javascript" src='/js/soundmanager2-nodebug-jsmin.js'></script>
 	<script type="text/javascript" src='/js/bootstrap.js'></script>
-	<script type="text/javascript" src='/js/diff_match_patch.js'></script>
 	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="/css/style.css">
 	<script type="text/javascript">
@@ -102,7 +101,7 @@ $(document).ready(function(){
 		setTimeout(function(){
 			$('#word').text(word);
 		}, 10 * user.handicap);
-		$('#word_input').val('');
+		typed_word = "";
 		correct_count = 0;
 	}
 	
@@ -157,11 +156,13 @@ $(document).ready(function(){
 		$("#word").empty();
 		//var error = false;
 		$("#word").append($("<span class='correct_letters'>" + word.substring(correct_count, -1) + "</span>"));
-		$("#word").append($("<span>" + word.substring(correct_count) + "</span>").addClass((typed_word.length - correct_count > 0)? "error_letters": "left_letters"));
+		$("#word").append($("<span>" + word.substring(correct_count) + "</span>").addClass((typed_word.length - correct_count > 0 && correct_count > 0)? "error_letters": "left_letters"));
 	}
 
 	var socket = io.connect();
 	var correct_count;
+	var typed_word = "";
+
 
 	socket.emit("join_game", document.location.pathname);
 	socket.on('game_connected', function(data){
@@ -174,28 +175,28 @@ $(document).ready(function(){
 			}
 		);
 
-		$('#word_input').keypress(
-			function(e){
-				if(e.keyCode==13) return false;
-				var typed_word = $(this).val()+String.fromCharCode(e.keyCode);
-				socket.emit('word_typed', { word: typed_word });
-				update_word_colors(typed_word);
-				//soundManager.play('type');
-			}
-		);
-		$('#word_input').keyup(
-			function(e){
-				e.preventDefault();
-				if(e.keyCode==8){
-					var typed_word = $(this).val()+String.fromCharCode(e.keyCode);
-					var cleaned_word = word.substring(correct_count, -1);
-					$(this).val(cleaned_word);
-					update_word_colors(cleaned_word);
-				}
+		$(document).keypress(function(e){
+			if(e.keyCode === 13) return false;
+
+			typed_word = typed_word+String.fromCharCode(e.keyCode);
+			socket.emit('word_typed', { word: typed_word });
+			update_word_colors(typed_word);
+		});
+
+		$(document).keyup(function(e){
+			if(e.keyCode === 8 || e.keyCode ===  46){
+				var cleaned_word = word.substring(correct_count, -1);
+				typed_word = cleaned_word;
+				update_word_colors(cleaned_word);
 				return false;
-				//soundManager.play('type');
 			}
-		);
+		});
+		$(document).keydown(function(e){
+			if(e.keyCode === 8){
+				return false
+			};
+		});
+
 		socket.on('welcome', function (data) {
 			users = data.users;
 			update_points(data.points);
@@ -219,7 +220,6 @@ $(document).ready(function(){
 						$("#game_wait").hide();
 						$("#starting-countdown").modal('hide');
 						$("#starting-countdown .modal-bdy").html("3");
-						$("#word_input").focus();
 					},1000);
 				},1000);
 			},1000);
@@ -265,8 +265,6 @@ $(document).ready(function(){
 			new_word(data.word);
 		});
 	});
-
-	$('#word_input').focus();
 	
 });
 </script>
@@ -279,13 +277,11 @@ $(document).ready(function(){
 		<h1>3</h1>
 	</div>
 		<div id='game_input' class="hero-unit" style="display:none">
-			<h1 id="word">
-				<span class="correct_letters"></span>
-				<span class="error_letters"></span>
-				<span class="left_letters"></span>
+			<h1>
+				<div id="word"></div>
 			</h1>
 			<form>
-				<input type=text id="word_input" name="word" value="" class='input-xlarge' autocomplete="off"/>
+				<input type="hidden" id="word_input" name="word" value="" class='input-xlarge' autocomplete="off"/>
 			</form>
 			<h2 id="winner"></h2>
 		</div>

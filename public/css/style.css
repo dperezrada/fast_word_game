@@ -46,9 +46,11 @@
 
 .correct_letters{
 	color:green;
+	border-bottom: 5px solid green;
 }
 .error_letters{
 	color:red;
+	border-bottom: 5px solid red;
 }
 .left_letters{
 	color:gray;
