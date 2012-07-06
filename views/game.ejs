@@ -157,7 +157,7 @@ $(document).ready(function(){
 		$("#word").empty();
 		//var error = false;
 		$("#word").append($("<span class='correct_letters'>" + word.substring(correct_count, -1) + "</span>"));
-		$("#word").append($("<span>" + word.substring(correct_count) + "</span>").addClass((typed_word.length - correct_count > 0 && correct_count > 0)? "error_letters": "left_letters"));
+		$("#word").append($("<span>" + word.substring(correct_count) + "</span>").addClass((typed_word.length - correct_count > 0)? "error_letters": "left_letters"));
 	}
 
 	var socket = io.connect();
