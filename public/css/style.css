@@ -23,6 +23,7 @@
 #game .user_column.admin{background-color: #F0B45A;}
 #time_limit{font-size: 19px;height: 36px;margin-top: 9px;}
 
+#word{height:60px;}
 .game_summary .status{
 	text-align: center;
 }
