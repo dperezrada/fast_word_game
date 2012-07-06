@@ -24,6 +24,7 @@
 #game #current_games_title {text-align: left;}
 .combobox{font-size: 19px;height: 36px;margin-top: 9px;}
 
+#word{height:60px;}
 .game_summary .status{
 	text-align: center;
 }
