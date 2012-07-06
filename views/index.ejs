@@ -2,7 +2,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 
-	<title>Index</title>
+	<title>Type-Fast Game</title>
 	<script type="text/javascript" src='http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js'></script>
 	<script type="text/javascript" src='http://underscorejs.org/underscore-min.js'></script>
 	<script type="text/javascript" src='/js/bootstrap.js'></script>
@@ -34,11 +34,9 @@
 				$('#status').html("Starting game...");	
 				setTimeout(function(){
 					$('#status').html("Launching...");	
-					setTimeout(function(){
-						window.location = "/game/"+Math.floor(Math.random()*1000000000000);
-					}, 1000);					
-				}, 1000);
-			}, 1000);
+					window.location = "/game/"+Math.floor(Math.random()*10000);			
+				}, 200);
+			}, 200);
 		});
 
 		var template = Hogan.compile($("#game_summary").html());
@@ -55,7 +53,8 @@
 				s.s_user_count = s.user_count + " player" + ((s.user_count == 1)?"":"s");
 				return template.render(s);;
 			});
-
+			
+			$("#current_games_title").toggle((games.length>0));
 			$("#public-games").empty();
 			_.each(games,function(g){
 				$("#public-games").append(g);
@@ -75,13 +74,14 @@
 	<div id='' class="hero-unit">
 		<h1 id="">Type Fast Game</h1>
 		<br>
-		<p>A real time typing challenge where you compete against your twitter friends</p>
-		<button class="create btn btn-success btn-large main-button">Create game</button>
+		<p>A real time typing challenge where you compete against your friends</p>
+		<button class="create btn btn-success btn-large main-button">Create new game</button>
 		<div id='status'></div>
+		<h3 id='current_games_title' style="display:none">...or join current players</h3>
+			<ul id="public-games" class="row">
+		</ul>
 	</div>
-	<h3>Current games:</h3>
-	<ul id="public-games" class="row">
-	</ul>
+	
 </div>
 
 

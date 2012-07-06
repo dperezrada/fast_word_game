@@ -271,74 +271,78 @@ $(document).ready(function(){
 </script>
 
 <div class="container" id='game'>
-	<div class="alert msg fade in">Give the url to your friends and tell them to join your game! 
-		<button type="button" class="close" data-dismiss="alert">×</button>
-	</div>
+	
 	<div id="countdown" style="display:none">
 		<h1>3</h1>
 	</div>
-		<div id='game_input' class="hero-unit" style="display:none">
-			<h1>
-				<div id="word"></div>
-			</h1>
-			<form>
-				<input type="hidden" id="word_input" name="word" value="" class='input-xlarge' autocomplete="off"/>
-			</form>
-			<h2 id="winner"></h2>
+	<div id='game_input' class="hero-unit" style="display:none">
+		<h1>
+			<div id="word"></div>
+		</h1>
+		<form>
+			<input type="hidden" id="word_input" name="word" value="" class='input-xlarge' autocomplete="off"/>
+		</form>
+		<h2 id="winner"></h2>
+	</div>
+	<div id="admin" class='hero-unit' style="display:none">
+		<h2>Set the game duration</h2>
+		<select id="time_limit" class="combobox">
+			<option selected="selected" value="60">1 minute</option>
+			<option value="120">2 minutes</option>
+			<option value="180">3 minutes</option>
+			<option value="240">4 minutes</option>
+			<option value="300">5 minutes</option>
+			<option value="360">6 minutes</option>
+		</select>
+		<br>
+		<h2>Choose the word set</h2>
+		<select id="words_set" class="combobox">
+			<option selected="selected" value="Countries">Countries</option>
+			<option value="Basketball players">Basketball players</option>
+			<option value="Tennis players">Tennis players</option>
+			<option value="Rock bands">Rock Bands</option>
+			<option value="Animals">Animals</option>
+		</select>
+		<br>
+		<form class ="form-inline">
+			<!--<label class="checkbox">
+				<input type="checkbox">Tweet for me!
+	  		</label>-->
+	  		<input type="button" id="start_game" value="Start" class='create btn btn-success btn-large start-button'/>
+	  	</form>
+	</div>
+	<div id="game_wait" class='hero-unit' style="display:none">
+		<h1>Waiting for the owner to start the game...</h1>
+	</div>
+	<div class="row" id="points">
+		<div class="span2 user_column place_1">
+			<div></div>
 		</div>
-		<div id="admin" class='hero-unit' style="display:none">
-			<span>Set the game duration</span>
-			<select id="time_limit">
-				<option selected="selected" value="60">1 minute</option>
-				<option value="120">2 minutes</option>
-				<option value="180">3 minutes</option>
-				<option value="240">4 minutes</option>
-				<option value="300">5 minutes</option>
-				<option value="360">6 minutes</option>
-			</select>
-			<br>
-			<span>Words set</span>
-			<select id="words_set">
-				<option selected="selected" value="Countries">Countries</option>
-				<option value="Basketball players">Basketball players</option>
-				<option value="Tennis players">Tennis players</option>
-				<option value="Rock bands">Rock Bands</option>
-				<option value="Animals">Animals</option>
-			</select>
-			<input type="button" id="start_game" value="Start" class='create btn btn-success btn-large start-button'/>
+		<div class="span2 user_column place_2">
+			<div></div>
 		</div>
-		<div id="game_wait" class='hero-unit' style="display:none">
-			<h1>Waiting the owner to start the game...</h1>
+		<div class="span2 user_column place_3">
+			<div></div>
 		</div>
-		<div class="row" id="points">
-			<div class="span2 user_column place_1">
-				<div></div>
-			</div>
-			<div class="span2 user_column place_2">
-				<div></div>
-			</div>
-			<div class="span2 user_column place_3">
-				<div></div>
-			</div>
-			<div class="span2 user_column place_4">
-				<div></div>
-			</div>
-			<div class="span2 user_column place_5">
-				<div></div>
-			</div>
-			<div class="span2 user_column place_6">
-				<div></div>
-			</div>
-		</div>	
-		<div class="modal hide" id="starting-countdown" data-backdrop="static" data-keyboard="false">
-			<div class="modal-bdy">
-				<div>Start typing in...</div>
-				<div class="starting-countdown-numbers">3</div>
-			</div>
+		<div class="span2 user_column place_4">
+			<div></div>
 		</div>
-		<div class="modal hide" id="winner-alert">
-			<div class="modal-bdy">The Winner!</div>
+		<div class="span2 user_column place_5">
+			<div></div>
 		</div>
+		<div class="span2 user_column place_6">
+			<div></div>
+		</div>
+	</div>	
+	<div class="modal hide" id="starting-countdown" data-backdrop="static" data-keyboard="false">
+		<div class="modal-bdy">
+			<div>Start typing in...</div>
+			<div class="starting-countdown-numbers">3</div>
+		</div>
+	</div>
+	<div class="modal hide" id="winner-alert">
+		<div class="modal-bdy">The Winner!</div>
+	</div>
 </div>
 
 

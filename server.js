@@ -42,11 +42,7 @@ app.listen(port);
 console.log(port);
 
 app.get('/', function (req, res) {
-	if (req.session.auth_data) {
-  		res.render('index',{auth_data: req.session.auth_data});
-  	} else {
-		authorize(req,res);	
-  	}
+  	res.render('index');
 });
 
 app.get('/game/:game_id', function (req, res) {

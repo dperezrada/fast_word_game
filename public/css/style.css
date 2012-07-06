@@ -21,7 +21,8 @@
 #game #starting-countdown .starting-countdown-numbers {font-size:200px; color: #FFF; padding: 80px; text-align:center;}
 #game #winner-alert .modal-bdy {font-size:48px; color: #FFF; padding: 5px; text-align:center; line-height:58px;}
 #game .user_column.admin{background-color: #F0B45A;}
-#time_limit{font-size: 19px;height: 36px;margin-top: 9px;}
+#game #current_games_title {text-align: left;}
+.combobox{font-size: 19px;height: 36px;margin-top: 9px;}
 
 .game_summary .status{
 	text-align: center;
