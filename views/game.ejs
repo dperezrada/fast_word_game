@@ -179,6 +179,12 @@ $(document).ready(function(){
 		$(document).keypress(function(e){
 			if(e.keyCode === 13) return false;
 
+			//Auto correct
+			if(String.fromCharCode(e.keyCode) == word.substr(correct_count,1)){
+				var cleaned_word = word.substring(correct_count, -1);
+				typed_word = cleaned_word;
+			}
+
 			typed_word = typed_word+String.fromCharCode(e.keyCode);
 			socket.emit('word_typed', { word: typed_word });
 			update_word_colors(typed_word);
